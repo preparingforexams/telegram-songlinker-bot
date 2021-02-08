@@ -1,6 +1,8 @@
 import json
 import os
+import uuid
 from typing import Iterable, Optional
+from urllib import parse
 
 import requests
 from requests import RequestException
@@ -11,8 +13,72 @@ _api_base_url = "https://api.song.link/v1-alpha.1/links"
 
 def handle_update(update, context):
     message = update.get('message')
-    if not message:
-        return
+    result = None
+    if message:
+        result = _handle_message(message)
+    inline_query = update.get('inline_query')
+    if inline_query:
+        result = _handle_query(inline_query)
+    if result:
+        print(json.dumps(result, separators=(',', ':')))
+        return result
+
+
+class SongLink:
+    def __init__(self, url: str, artist: Optional[str] = None, title: Optional[str] = None):
+        self.url = url
+        self.artist = artist
+        self.title = title
+
+    def to_message_content(self) -> str:
+        artist = self.artist
+        title = self.title
+        if not artist or not title:
+            return self.url
+        else:
+            return f"{artist} - {title}: {self.url}"
+
+    def to_inline_result(self) -> dict:
+        artist = self.artist
+        title = self.title
+        result_title = self.url
+        if artist and title:
+            result_title = f"{artist} - {title}"
+        return {
+            'type': "article",
+            'id': _random_id(),
+            'title': result_title,
+            'url': self.url,
+            'input_message_content': {
+                'message_text': self.to_message_content(),
+                'disable_web_page_preview': True
+            }
+        }
+
+
+def _random_id() -> str:
+    return str(uuid.uuid4())
+
+
+def _handle_query(query: dict) -> Optional[dict]:
+    query_text: str = query['query'].strip()
+    song_link: Optional[SongLink] = None
+    if query_text:
+        try:
+            url = parse.urlparse(query_text)
+            if url.scheme == 'http' or url.scheme == 'https':
+                song_link = _build_link(query_text)
+        except ValueError:
+            pass
+    results = [song_link.to_inline_result()] if song_link else []
+    return {
+        'method': "answerInlineQuery",
+        'inline_query_id': query['id'],
+        'results': results
+    }
+
+
+def _handle_message(message: dict) -> Optional[dict]:
     chat = message['chat']
     entities = message.get('entities')
     if not entities:
@@ -39,9 +105,9 @@ def handle_update(update, context):
         print("No URLs after filtering")
         return
 
-    links = filter(None, map(_build_link, urls))
+    links = filter(None, map(SongLink.to_message_content, map(_build_link, urls)))
 
-    result = {
+    return {
         'method': 'sendMessage',
         'chat_id': chat['id'],
         'reply_to_message_id': message['message_id'],
@@ -49,15 +115,13 @@ def handle_update(update, context):
         'disable_notification': True,
         'text': _build_message(links)
     }
-    print(json.dumps(result, separators=(',', ':')))
-    return result
 
 
 def _not_song_link(url: str) -> bool:
     return "song.link" not in url
 
 
-def _build_link(url: str) -> Optional[str]:
+def _build_link(url: str) -> Optional[SongLink]:
     params = {
         'url': url,
         'userCountry': "DE"
@@ -71,19 +135,17 @@ def _build_link(url: str) -> Optional[str]:
         result.raise_for_status()
         info = result.json()
         bare_url = info['pageUrl']
-        prefix = ""
         entities_by_id: dict = info['entitiesByUniqueId']
         for match in entities_by_id.values():
             if match['apiProvider'] == 'spotify':
                 title = match.get('title')
                 artist = match.get('artistName')
-                prefix = f"{artist} - {title}: "
-                break
+                return SongLink(bare_url, artist, title)
 
-        return prefix + bare_url
+        return SongLink(bare_url)
     except RequestException as e:
         print(f"Could not get URL from API: {e}")
-        return f"https://song.link/{url}"
+        return SongLink(f"https://song.link/{url}")
 
 
 def _build_message(links: Iterable[str]) -> str:
