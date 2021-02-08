@@ -5,3 +5,7 @@ variable "bot_name" {
 variable "telegram_token" {
   type = string
 }
+
+variable "songlink_api_token" {
+  type = string
+}

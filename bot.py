@@ -8,6 +8,7 @@ import requests
 from requests import RequestException
 
 _bot_token = os.getenv('TELEGRAM_TOKEN')
+_api_key = os.getenv('SONGLINK_API_TOKEN')
 _api_base_url = "https://api.song.link/v1-alpha.1/links"
 
 
@@ -124,7 +125,8 @@ def _not_song_link(url: str) -> bool:
 def _build_link(url: str) -> Optional[SongLink]:
     params = {
         'url': url,
-        'userCountry': "DE"
+        'userCountry': "DE",
+        'key': _api_key
     }
 
     try:
