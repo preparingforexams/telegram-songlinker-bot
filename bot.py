@@ -1,8 +1,12 @@
 import json
 import os
-from typing import Iterable
+from typing import Iterable, Optional
+
+import requests
+from requests import RequestException
 
 _bot_token = os.getenv('TELEGRAM_TOKEN')
+_api_base_url = "https://api.song.link/v1-alpha.1/links"
 
 
 def handle_update(update, context):
@@ -35,7 +39,7 @@ def handle_update(update, context):
         print("No URLs after filtering")
         return
 
-    links = map(_build_link, urls)
+    links = filter(None, map(_build_link, urls))
 
     result = {
         'method': 'sendMessage',
@@ -53,8 +57,23 @@ def _not_song_link(url: str) -> bool:
     return "song.link" not in url
 
 
-def _build_link(url: str) -> str:
-    return f"https://song.link/{url}"
+def _build_link(url: str) -> Optional[str]:
+    params = {
+        'url': url,
+        'userCountry': "DE"
+    }
+
+    try:
+        result = requests.get(_api_base_url, params=params)
+        if result.status_code == 400 and result.json()['code'] == "could_not_resolve_entity":
+            # In this case the URL just isn't a song
+            return None
+        result.raise_for_status()
+        info = result.json()
+        return info['pageUrl']
+    except RequestException as e:
+        print(f"Could not get URL from API: {e}")
+        return f"https://song.link/{url}"
 
 
 def _build_message(links: Iterable[str]) -> str:
