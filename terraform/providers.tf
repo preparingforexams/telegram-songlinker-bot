@@ -3,7 +3,7 @@ terraform {
     hostname = "app.terraform.io"
 
     workspaces {
-      # TODO: name = "workspacename"
+      name = "songlinkbot"
     }
   }
 
@@ -30,12 +30,18 @@ provider "cloudflare" {
   api_token = var.cloudflare_token
 }
 
+variable "aws_profile" {
+  default = "default"
+  type = string
+}
+
 variable "aws_region" {
   default = "eu-central-1"
+  type = string
 }
 
 provider "aws" {
-  profile = "default"
+  profile = var.aws_profile
   region  = var.aws_region
 }
 
