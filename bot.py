@@ -1,3 +1,4 @@
+import json
 import os
 from typing import Iterable
 
@@ -11,9 +12,10 @@ def handle_update(update, context):
     chat = message['chat']
     entities = message.get('entities')
     if not entities:
+        print("No entities in message")
         return
 
-    links = []
+    urls = []
 
     for entity in entities:
         entity_type = entity['type']
@@ -21,16 +23,21 @@ def handle_update(update, context):
             offset = int(entity['offset'])
             length = int(entity['length'])
             url = message['text'][offset:offset + length]
-            links.append(_build_link(url))
+            urls.append(url)
         elif entity_type == "text_link":
-            links.append(_build_link(entity['url']))
+            urls.append(entity['url'])
 
-    links = set(filter(_not_song_link, links))
+    print(f"Got {len(urls)} URLs")
 
-    if not links:
+    urls = list(dict.fromkeys(filter(_not_song_link, urls)))
+
+    if not urls:
+        print("No URLs after filtering")
         return
 
-    return {
+    links = map(_build_link, urls)
+
+    result = {
         'method': 'sendMessage',
         'chat_id': chat['id'],
         'reply_to_message_id': message['message_id'],
@@ -38,10 +45,12 @@ def handle_update(update, context):
         'disable_notification': True,
         'text': _build_message(links)
     }
+    print(json.dumps(result, separators=(',', ':')))
+    return result
 
 
 def _not_song_link(url: str) -> bool:
-    return "song.link" in url
+    return "song.link" not in url
 
 
 def _build_link(url: str) -> str:
