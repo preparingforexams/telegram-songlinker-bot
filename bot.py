@@ -70,7 +70,17 @@ def _build_link(url: str) -> Optional[str]:
             return None
         result.raise_for_status()
         info = result.json()
-        return info['pageUrl']
+        bare_url = info['pageUrl']
+        prefix = ""
+        entities_by_id: dict = info['entitiesByUniqueId']
+        for match in entities_by_id.values():
+            if match['apiProvider'] == 'spotify':
+                title = match.get('title')
+                artist = match.get('artistName')
+                prefix = f"{artist} - {title}: "
+                break
+
+        return prefix + bare_url
     except RequestException as e:
         print(f"Could not get URL from API: {e}")
         return f"https://song.link/{url}"
