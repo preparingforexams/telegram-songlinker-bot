@@ -1,0 +1,19 @@
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# Distribution files
+*.zip
+python/
+
+# Python
+venv/
+*.pyc
+
+# Terraform
+*.tfvars
+.terraform
+
+# macOS
+.DS_Store
