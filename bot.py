@@ -1,6 +1,7 @@
 import json
 import os
 import uuid
+from dataclasses import dataclass
 from typing import Iterable, Optional
 from urllib import parse
 
@@ -25,11 +26,11 @@ def handle_update(update, context):
         return result
 
 
+@dataclass
 class SongLink:
-    def __init__(self, url: str, artist: Optional[str] = None, title: Optional[str] = None):
-        self.url = url
-        self.artist = artist
-        self.title = title
+    url: str
+    artist: Optional[str] = None
+    title: Optional[str] = None
 
     def to_message_content(self) -> str:
         artist = self.artist
@@ -106,7 +107,7 @@ def _handle_message(message: dict) -> Optional[dict]:
         print("No URLs after filtering")
         return
 
-    links = filter(None, map(SongLink.to_message_content, map(_build_link, urls)))
+    links = filter(None, (_build_link(it).to_message_content() for it in urls))
 
     return {
         'method': 'sendMessage',
