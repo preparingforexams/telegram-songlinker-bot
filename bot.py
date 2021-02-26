@@ -52,7 +52,7 @@ class SongLink:
             'title': result_title,
             'url': self.url,
             'input_message_content': {
-                'message_text': self.to_message_content(),
+                'message_text': self.url,
             }
         }
 
