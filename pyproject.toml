@@ -14,7 +14,7 @@ sentry-sdk = "1.5.10"
 [tool.poetry.dev-dependencies]
 black = "^22.3.0"
 flake8 = "^4.0.1"
-mypy = "0.942"
+mypy = "0.961"
 types-requests = "2.27.20"
 
 [build-system]
