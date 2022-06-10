@@ -1,0 +1,6 @@
+image: ghcr.io/preparingforexams/telegram-songlinker-bot:${GITHUB_SHA}
+apiToken:
+  songlink: ${SONGLINK_API_TOKEN}
+  telegram: ${TELEGRAM_API_TOKEN}
+sentry:
+  dsn: ${SENTRY_DSN}

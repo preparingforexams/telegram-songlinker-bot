@@ -1,0 +1,7 @@
+apiVersion: v2
+name: songlinker
+description: "Shows song.link URLs for songs"
+
+type: application
+
+version: 2.0.0

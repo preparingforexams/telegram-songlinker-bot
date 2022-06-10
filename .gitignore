@@ -1,19 +1,21 @@
-# IDEs
+# Files and directories created by pub.
+__pycache__
+.venv
+
+# Conventional directory for build output.
+build/
+
+# IntelliJ IDEA
 .idea/
-.vscode/
-*.iml
 
-# Distribution files
-*.zip
-python/
+.pytest_cache/
 
-# Python
-venv/
-*.pyc
-
-# Terraform
-*.tfvars
-.terraform
+*.env
 
 # macOS
 .DS_Store
+
+# Legacy
+terraform
+python
+*.zip
