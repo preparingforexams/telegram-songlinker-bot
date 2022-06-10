@@ -25,4 +25,6 @@ spec:
           image: {{ .Values.image }}
           args:
             - handle-updates
-
+          envFrom:
+            - secretRef:
+                name: secrets
