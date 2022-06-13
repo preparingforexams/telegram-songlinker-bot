@@ -99,7 +99,7 @@ def _handle_message(message: dict):
         if entity_type == "url":
             offset = int(entity["offset"])
             length = int(entity["length"])
-            url = message["text"][offset: offset + length]
+            url = message["text"][offset : offset + length]
             urls.append(url)
         elif entity_type == "text_link":
             urls.append(entity["url"])
