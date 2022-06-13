@@ -89,7 +89,7 @@ def _handle_message(message: dict):
     chat = message["chat"]
     entities = message.get("entities")
     if not entities:
-        print("No entities in message")
+        _LOG.debug("No entities in message")
         return
 
     urls = []
@@ -99,17 +99,17 @@ def _handle_message(message: dict):
         if entity_type == "url":
             offset = int(entity["offset"])
             length = int(entity["length"])
-            url = message["text"][offset : offset + length]
+            url = message["text"][offset: offset + length]
             urls.append(url)
         elif entity_type == "text_link":
             urls.append(entity["url"])
 
-    print(f"Got {len(urls)} URLs")
+    _LOG.debug("Got %d URLs", len(urls))
 
     urls = list(dict.fromkeys(filter(_not_song_link, urls)))
 
     if not urls:
-        print("No URLs after filtering")
+        _LOG.info("No URLs after filtering")
         return
 
     links = (_build_link(url) for url in urls)
@@ -151,8 +151,8 @@ def _build_link(url: str) -> Optional[SongLink]:
 
         return SongLink(bare_url)
     except RequestException as e:
-        print(f"Could not get URL from API: {e}")
-        return SongLink(f"https://song.link/{url}")
+        _LOG.warning("Could not get URL from API", exc_info=e)
+        return None
 
 
 def _build_message(links: Iterable[str]) -> str:
