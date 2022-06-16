@@ -113,7 +113,10 @@ def _handle_message(message: dict):
         return
 
     links = (_build_link(url) for url in urls)
-    message_contents = (link.to_message_content() for link in links if link is not None)
+    message_contents = [link.to_message_content() for link in links if link is not None]
+    if not message_contents:
+        _LOG.info("No known songs found")
+        return
 
     telegram.send_message(
         chat_id=chat["id"],
