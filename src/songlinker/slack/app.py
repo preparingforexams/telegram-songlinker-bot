@@ -15,4 +15,4 @@ class SlackApp:
 
     def run(self):
         # TODO: implement
-        self.app.start(self.port)
+        self.app.start(port=self.port, path="/")
