@@ -43,6 +43,8 @@ jobs:
         run: "envsubst < values.yaml > values_sub.yaml && mv values_sub.yaml values.yaml"
         env:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
+          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
           SONGLINK_API_TOKEN: ${{ secrets.SONGLINK_API_TOKEN }}
           TELEGRAM_API_TOKEN: ${{ secrets.TELEGRAM_API_TOKEN }}
       - uses: WyriHaximus/github-action-helm3@v2

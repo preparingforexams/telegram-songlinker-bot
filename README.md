@@ -1,1 +1,1 @@
-# telegram-songlinker-bot
+# songlinker-bot

@@ -4,3 +4,6 @@ apiToken:
   telegram: ${TELEGRAM_API_TOKEN}
 sentry:
   dsn: ${SENTRY_DSN}
+slack:
+  token: ${SLACK_TOKEN}
+  signingSecret: ${SLACK_SIGNING_SECRET}

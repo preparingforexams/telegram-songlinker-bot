@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-issuer-http
+spec:
+  rules:
+    - host: slack.songlink.bjoernpetersen.net
+      http:
+        paths:
+          - backend:
+              service:
+                name: api
+                port:
+                  name: slack
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - slack.songlink.bjoernpetersen.net
+      secretName: api-cert
