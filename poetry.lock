@@ -327,27 +327,15 @@ pathspec = []
 platformdirs = []
 pycodestyle = []
 pyflakes = []
-requests = [
-    {file = "requests-2.28.1-py3-none-any.whl", hash = "sha256:8fefa2a1a1365bf5520aac41836fbee479da67864514bdb821f31ce07ce65349"},
-    {file = "requests-2.28.1.tar.gz", hash = "sha256:7c5599b102feddaa661c826c56ab4fee28bfd17f5abca1ebbe3e7f19d7c97983"},
-]
-sentry-sdk = [
-    {file = "sentry-sdk-1.6.0.tar.gz", hash = "sha256:b82ad57306d5546713f15d5d70daea0408cf7f998c7566db16e0e6257e51e561"},
-    {file = "sentry_sdk-1.6.0-py2.py3-none-any.whl", hash = "sha256:ddbd191b6f4e696b7845b4d87389898ae1207981faf114f968a57363aa6be03c"},
-]
+requests = []
+sentry-sdk = []
 slack-bolt = [
     {file = "slack_bolt-1.14.0-py2.py3-none-any.whl", hash = "sha256:86acccfb668ae57d553126cfb46ab694893e71aa7d3f78af597464d4148b4fcb"},
     {file = "slack_bolt-1.14.0.tar.gz", hash = "sha256:2b3e41249616925325e3788b224440d8a70757885fd364d59eacc71db798a7ee"},
 ]
-slack-sdk = [
-    {file = "slack_sdk-3.17.2-py2.py3-none-any.whl", hash = "sha256:70d5a55a5d52ba7128d5347ed995425e1f83e729667ab296035bcf6c1b13a049"},
-    {file = "slack_sdk-3.17.2.tar.gz", hash = "sha256:60302e32d48db6b4ea5453d92f23ecf3f7b843f799f61eaf271315264d7cb281"},
-]
+slack-sdk = []
 tomli = []
-types-requests = [
-    {file = "types-requests-2.28.0.tar.gz", hash = "sha256:9863d16dfbb3fa55dcda64fa3b989e76e8859033b26c1e1623e30465cfe294d3"},
-    {file = "types_requests-2.28.0-py3-none-any.whl", hash = "sha256:85383b4ef0535f639c3f06c5bbb6494bbf59570c4cd88bbcf540f0b2ac1b49ab"},
-]
+types-requests = []
 types-urllib3 = []
 typing-extensions = [
     {file = "typing_extensions-4.3.0-py3-none-any.whl", hash = "sha256:25642c956049920a5aa49edcdd6ab1e06d7e5d467fc00e0506c44ac86fbfca02"},
