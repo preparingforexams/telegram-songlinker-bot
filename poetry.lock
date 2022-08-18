@@ -213,11 +213,11 @@ python-versions = ">=3.6"
 slack-sdk = ">=3.17.2,<4"
 
 [package.extras]
-adapter = ["boto3 (<=2)", "bottle (>=0.12,<1)", "chalice (>=1.26.5,<2)", "click (>=7,<8)", "CherryPy (>=18,<19)", "Django (>=3,<5)", "falcon (>=2,<4)", "fastapi (>=0.70.0,<1)", "Flask (>=1,<3)", "Werkzeug (>=2,<3)", "pyramid (>=1,<3)", "sanic (>=21,<22)", "starlette (>=0.14,<1)", "tornado (>=6,<7)", "uvicorn (<1)", "gunicorn (>=20,<21)", "websocket-client (>=1.2.3,<2)"]
-adapter_testing = ["moto (>=3,<4)", "docker (>=5,<6)", "boddle (>=0.2,<0.3)", "Flask (>=1,<2)", "Werkzeug (>=1,<2)", "sanic-testing (>=0.7)", "requests (>=2,<3)"]
-async = ["aiohttp (>=3,<4)", "websockets (>=8,<10)"]
-testing = ["pytest (>=6.2.5,<7)", "pytest-cov (>=3,<4)", "Flask-Sockets (>=0.2,<1)", "Werkzeug (>=1,<2)", "itsdangerous (==2.0.1)", "Jinja2 (==3.0.3)", "black (==22.3.0)", "click (<=8.0.4)", "pytest-asyncio (>=0.18.2,<1)", "aiohttp (>=3,<4)"]
-testing_without_asyncio = ["pytest (>=6.2.5,<7)", "pytest-cov (>=3,<4)", "Flask-Sockets (>=0.2,<1)", "Werkzeug (>=1,<2)", "itsdangerous (==2.0.1)", "Jinja2 (==3.0.3)", "black (==22.3.0)", "click (<=8.0.4)"]
+testing_without_asyncio = ["click (<=8.0.4)", "black (==22.3.0)", "Jinja2 (==3.0.3)", "itsdangerous (==2.0.1)", "Werkzeug (>=1,<2)", "Flask-Sockets (>=0.2,<1)", "pytest-cov (>=3,<4)", "pytest (>=6.2.5,<7)"]
+testing = ["aiohttp (>=3,<4)", "pytest-asyncio (>=0.18.2,<1)", "click (<=8.0.4)", "black (==22.3.0)", "Jinja2 (==3.0.3)", "itsdangerous (==2.0.1)", "Werkzeug (>=1,<2)", "Flask-Sockets (>=0.2,<1)", "pytest-cov (>=3,<4)", "pytest (>=6.2.5,<7)"]
+async = ["websockets (>=8,<10)", "aiohttp (>=3,<4)"]
+adapter_testing = ["requests (>=2,<3)", "sanic-testing (>=0.7)", "Werkzeug (>=1,<2)", "Flask (>=1,<2)", "boddle (>=0.2,<0.3)", "docker (>=5,<6)", "moto (>=3,<4)"]
+adapter = ["websocket-client (>=1.2.3,<2)", "gunicorn (>=20,<21)", "uvicorn (<1)", "tornado (>=6,<7)", "starlette (>=0.14,<1)", "sanic (>=21,<22)", "pyramid (>=1,<3)", "Werkzeug (>=2,<3)", "Flask (>=1,<3)", "fastapi (>=0.70.0,<1)", "falcon (>=2,<4)", "Django (>=3,<5)", "CherryPy (>=18,<19)", "click (>=7,<8)", "chalice (>=1.26.5,<2)", "bottle (>=0.12,<1)", "boto3 (<=2)"]
 
 [[package]]
 name = "slack-sdk"
@@ -228,8 +228,8 @@ optional = false
 python-versions = ">=3.6.0"
 
 [package.extras]
-testing = ["moto (>=3,<4)", "boto3 (<=2)", "databases (>=0.5)", "psutil (>=5,<6)", "click (==8.0.4)", "black (==22.3.0)", "flake8 (>=4,<5)", "codecov (>=2,<3)", "pytest-cov (>=2,<3)", "Jinja2 (==3.0.3)", "itsdangerous (==1.1.0)", "Werkzeug (<2)", "Flask (>=1,<2)", "Flask-Sockets (>=0.2,<1)", "pytest-asyncio (<1)", "pytest (>=6.2.5,<7)"]
-optional = ["websocket-client (>=1,<2)", "websockets (>=10,<11)", "SQLAlchemy (>=1,<2)", "boto3 (<=2)", "aiohttp (>=3.7.3,<4)", "aiodns (>1.0)"]
+optional = ["aiodns (>1.0)", "aiohttp (>=3.7.3,<4)", "boto3 (<=2)", "SQLAlchemy (>=1,<2)", "websockets (>=10,<11)", "websocket-client (>=1,<2)"]
+testing = ["pytest (>=6.2.5,<7)", "pytest-asyncio (<1)", "Flask-Sockets (>=0.2,<1)", "Flask (>=1,<2)", "Werkzeug (<2)", "itsdangerous (==1.1.0)", "Jinja2 (==3.0.3)", "pytest-cov (>=2,<3)", "codecov (>=2,<3)", "flake8 (>=4,<5)", "black (==22.3.0)", "click (==8.0.4)", "psutil (>=5,<6)", "databases (>=0.5)", "boto3 (<=2)", "moto (>=3,<4)"]
 
 [[package]]
 name = "tomli"
@@ -241,7 +241,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "types-requests"
-version = "2.28.8"
+version = "2.28.9"
 description = "Typing stubs for requests"
 category = "dev"
 optional = false
@@ -282,7 +282,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.10"
-content-hash = "d146525cdb3f1da8cc3708497a7ade4b77a8b786a811ad77a37c60a721600a13"
+content-hash = "1aae1cd9eb124db0ed296bc5ebe1e1b04a26e25deea12a17b67ed54c951d1586"
 
 [metadata.files]
 black = [
@@ -404,8 +404,8 @@ tomli = [
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
 ]
 types-requests = [
-    {file = "types-requests-2.28.8.tar.gz", hash = "sha256:7a9f7b152d594a1c18dd4932cdd2596b8efbeedfd73caa4e4abb3755805b4685"},
-    {file = "types_requests-2.28.8-py3-none-any.whl", hash = "sha256:b0421f9f2d0dd0f8df2c75f974686517ca67473f05b466232d4c6384d765ad7a"},
+    {file = "types-requests-2.28.9.tar.gz", hash = "sha256:feaf581bd580497a47fe845d506fa3b91b484cf706ff27774e87659837de9962"},
+    {file = "types_requests-2.28.9-py3-none-any.whl", hash = "sha256:86cb66d3de2f53eac5c09adc42cf6547eefbd0c7e1210beca1ee751c35d96083"},
 ]
 types-urllib3 = [
     {file = "types-urllib3-1.26.22.tar.gz", hash = "sha256:b05af90e73889e688094008a97ca95788db8bf3736e2776fd43fb6b171485d94"},
