@@ -200,7 +200,7 @@ tornado = ["tornado (>=5)"]
 
 [[package]]
 name = "slack-bolt"
-version = "1.15.1"
+version = "1.15.2"
 description = "The Bolt Framework for Python"
 category = "main"
 optional = false
@@ -249,7 +249,7 @@ types-urllib3 = "<1.27"
 
 [[package]]
 name = "types-urllib3"
-version = "1.26.25"
+version = "1.26.25.1"
 description = "Typing stubs for urllib3"
 category = "dev"
 optional = false
@@ -388,8 +388,8 @@ sentry-sdk = [
     {file = "sentry_sdk-1.10.1-py2.py3-none-any.whl", hash = "sha256:06c0fa9ccfdc80d7e3b5d2021978d6eb9351fa49db9b5847cf4d1f2a473414ad"},
 ]
 slack-bolt = [
-    {file = "slack_bolt-1.15.1-py2.py3-none-any.whl", hash = "sha256:583a319734ee7de2fca758605c92253de7b3c9ef72d0c38251126c055af0d1c1"},
-    {file = "slack_bolt-1.15.1.tar.gz", hash = "sha256:8ead9331d7733a1ed364c4c57cf7a10fcb8c4be509ddba778c04e9efee9883cf"},
+    {file = "slack_bolt-1.15.2-py2.py3-none-any.whl", hash = "sha256:e234b3305ea55ce8f2e1274bc0c0a2a79531ad501db8d8f70a42881d5001c0ad"},
+    {file = "slack_bolt-1.15.2.tar.gz", hash = "sha256:18d60c99de0ff786a302dd872b2c0a63e46b6922b7ce2e352372effc321d0bdd"},
 ]
 slack-sdk = [
     {file = "slack_sdk-3.19.1-py2.py3-none-any.whl", hash = "sha256:a0bafb9e53ffbc408a8b5a42443525aac2c0c7347223d9373dd9d41cf90c9343"},
@@ -404,8 +404,8 @@ types-requests = [
     {file = "types_requests-2.28.11.2-py3-none-any.whl", hash = "sha256:14941f8023a80b16441b3b46caffcbfce5265fd14555844d6029697824b5a2ef"},
 ]
 types-urllib3 = [
-    {file = "types-urllib3-1.26.25.tar.gz", hash = "sha256:5aef0e663724eef924afa8b320b62ffef2c1736c1fa6caecfc9bc6c8ae2c3def"},
-    {file = "types_urllib3-1.26.25-py3-none-any.whl", hash = "sha256:c1d78cef7bd581e162e46c20a57b2e1aa6ebecdcf01fd0713bb90978ff3e3427"},
+    {file = "types-urllib3-1.26.25.1.tar.gz", hash = "sha256:a948584944b2412c9a74b9cf64f6c48caf8652cb88b38361316f6d15d8a184cd"},
+    {file = "types_urllib3-1.26.25.1-py3-none-any.whl", hash = "sha256:f6422596cc9ee5fdf68f9d547f541096a20c2dcfd587e37c804c9ea720bf5cb2"},
 ]
 typing-extensions = [
     {file = "typing_extensions-4.4.0-py3-none-any.whl", hash = "sha256:16fa4864408f655d35ec496218b85f79b3437c829e93320c7c9215ccfd92489e"},
