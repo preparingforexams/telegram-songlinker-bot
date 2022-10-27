@@ -11,7 +11,6 @@ click = ">=8.0.0"
 mypy-extensions = ">=0.4.3"
 pathspec = ">=0.9.0"
 platformdirs = ">=2"
-tomli = {version = ">=1.1.0", markers = "python_full_version < \"3.11.0a7\""}
 
 [package.extras]
 colorama = ["colorama (>=0.4.3)"]
@@ -96,7 +95,6 @@ python-versions = ">=3.7"
 
 [package.dependencies]
 mypy-extensions = ">=0.4.3"
-tomli = {version = ">=1.1.0", markers = "python_version < \"3.11\""}
 typing-extensions = ">=3.10"
 
 [package.extras]
@@ -229,14 +227,6 @@ optional = ["SQLAlchemy (>=1,<2)", "aiodns (>1.0)", "aiohttp (>=3.7.3,<4)", "bot
 testing = ["Flask (>=1,<2)", "Flask-Sockets (>=0.2,<1)", "Jinja2 (==3.0.3)", "Werkzeug (<2)", "black (==22.8.0)", "boto3 (<=2)", "click (==8.0.4)", "codecov (>=2,<3)", "databases (>=0.5)", "flake8 (>=5,<6)", "itsdangerous (==1.1.0)", "moto (>=3,<4)", "psutil (>=5,<6)", "pytest (>=6.2.5,<7)", "pytest-asyncio (<1)", "pytest-cov (>=2,<3)"]
 
 [[package]]
-name = "tomli"
-version = "2.0.1"
-description = "A lil' TOML parser"
-category = "dev"
-optional = false
-python-versions = ">=3.7"
-
-[[package]]
 name = "types-requests"
 version = "2.28.11.2"
 description = "Typing stubs for requests"
@@ -278,8 +268,8 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [metadata]
 lock-version = "1.1"
-python-versions = "~3.10"
-content-hash = "4c5d622ea61c310502c94b90c084923f5ba5e79478a34a388ef9b19d5a425cb9"
+python-versions = "~3.11"
+content-hash = "c1fbd9d2cbf909bba1b76866c9e50038485923157d342dd86d64293ba22578e0"
 
 [metadata.files]
 black = [
@@ -394,10 +384,6 @@ slack-bolt = [
 slack-sdk = [
     {file = "slack_sdk-3.19.1-py2.py3-none-any.whl", hash = "sha256:a0bafb9e53ffbc408a8b5a42443525aac2c0c7347223d9373dd9d41cf90c9343"},
     {file = "slack_sdk-3.19.1.tar.gz", hash = "sha256:5db78a3ed3c58b3b0a2bdbe40bac43c7b00edcbc12ff6a7778ac5cbe3a3a2899"},
-]
-tomli = [
-    {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
-    {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
 ]
 types-requests = [
     {file = "types-requests-2.28.11.2.tar.gz", hash = "sha256:fdcd7bd148139fb8eef72cf4a41ac7273872cad9e6ada14b11ff5dfdeee60ed3"},
