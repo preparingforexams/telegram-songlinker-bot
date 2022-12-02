@@ -218,7 +218,7 @@ testing-without-asyncio = ["Flask-Sockets (>=0.2,<1)", "Jinja2 (==3.0.3)", "Werk
 
 [[package]]
 name = "slack-sdk"
-version = "3.19.4"
+version = "3.19.5"
 description = "The Slack API Platform SDK for Python"
 category = "main"
 optional = false
@@ -390,8 +390,8 @@ slack-bolt = [
     {file = "slack_bolt-1.15.5.tar.gz", hash = "sha256:93dc73bdc8469badf5c8c4e3d4085f29756d4de5bd6688220a13b922691d838d"},
 ]
 slack-sdk = [
-    {file = "slack_sdk-3.19.4-py2.py3-none-any.whl", hash = "sha256:71e222f5a55d2f704638602f0883def9d331539462edc6d9cb88f83044fbce70"},
-    {file = "slack_sdk-3.19.4.tar.gz", hash = "sha256:67b05e636fee6e2cb2ed140fc79cb1cd370a7a983ec6e60fdebaf83e48a53383"},
+    {file = "slack_sdk-3.19.5-py2.py3-none-any.whl", hash = "sha256:0b52bb32a87c71f638b9eb47e228dffeebf89de5e762684ef848276f9f186c84"},
+    {file = "slack_sdk-3.19.5.tar.gz", hash = "sha256:47fb4af596243fe6585a92f3034de21eb2104a55cc9fd59a92ef3af17cf9ddd8"},
 ]
 types-requests = [
     {file = "types-requests-2.28.11.5.tar.gz", hash = "sha256:a7df37cc6fb6187a84097da951f8e21d335448aa2501a6b0a39cbd1d7ca9ee2a"},
