@@ -25,12 +25,11 @@ def handle_updates():
 
 
 def _handle_update(update: dict) -> None:
-    message = update.get("message")
-    if message:
-        _handle_message(message)
-    inline_query = update.get("inline_query")
-    if inline_query:
-        _handle_query(inline_query)
+    match update:
+        case {"message": message} if message:
+            _handle_message(message)
+        case {"inline_query": inline_query} if inline_query:
+            _handle_query(inline_query)
 
 
 @dataclass
