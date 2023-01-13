@@ -5,7 +5,6 @@ import click
 import sentry_sdk
 
 from . import bot
-from .slack.app import SlackApp
 
 _LOG = logging.getLogger("songlinker")
 
@@ -39,12 +38,6 @@ def app():
 @app.command()
 def handle_updates():
     bot.handle_updates()
-
-
-@app.command()
-def run_slack_app():
-    slack = SlackApp()
-    slack.run()
 
 
 if __name__ == "__main__":
