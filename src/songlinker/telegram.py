@@ -6,6 +6,7 @@ import requests
 
 _API_KEY = os.getenv("TELEGRAM_API_KEY")
 _LOG = logging.getLogger(__name__)
+_session = requests.Session()
 
 
 def check():
@@ -33,7 +34,7 @@ def _request_updates(last_update_id: Optional[int]) -> List[dict]:
             "timeout": 10,
         }
     return _get_actual_body(
-        requests.post(
+        _session.post(
             _build_url("getUpdates"),
             json=body,
             timeout=12,
@@ -62,7 +63,7 @@ def send_message(
     disable_notification: bool = False,
 ) -> dict:
     return _get_actual_body(
-        requests.post(
+        _session.post(
             _build_url("sendMessage"),
             json={
                 "chat_id": chat_id,
@@ -79,7 +80,7 @@ def send_message(
 
 def answer_inline_query(inline_query_id: str | int, results: list):
     return _get_actual_body(
-        requests.post(
+        _session.post(
             _build_url("answerInlineQuery"),
             json={
                 "inline_query_id": inline_query_id,
