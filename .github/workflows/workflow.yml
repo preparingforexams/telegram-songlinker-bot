@@ -46,7 +46,7 @@ jobs:
           SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
           SONGLINK_API_TOKEN: ${{ secrets.SONGLINK_API_TOKEN }}
           TELEGRAM_API_TOKEN: ${{ secrets.TELEGRAM_API_TOKEN }}
-      - uses: WyriHaximus/github-action-helm3@v2
+      - uses: WyriHaximus/github-action-helm3@v3
         with:
           exec: helm upgrade bot . --install --namespace=telegram-songlinker-bot
           kubeconfig: '${{ secrets.KUBECONFIG_RAW }}'
