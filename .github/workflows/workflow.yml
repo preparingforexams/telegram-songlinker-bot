@@ -7,7 +7,7 @@ jobs:
     container: python:3.11-slim
     steps:
       - name: Install Poetry
-        run: pip install poetry==1.4.1
+        run: pip install poetry==1.4.2
       - uses: actions/checkout@v3
       - run: poetry install
       - name: Check coding standards
