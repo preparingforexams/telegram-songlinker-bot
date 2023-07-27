@@ -43,7 +43,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: false
-          tags: "ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}/app:${{ github.sha }}"
+          tags: "ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ github.sha }}"
 
   push-container-image:
     runs-on: ubuntu-latest
