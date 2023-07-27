@@ -1,4 +1,4 @@
-image: ghcr.io/preparingforexams/telegram-songlinker-bot:${GITHUB_SHA}
+image: ${IMAGE_NAME}:${GITHUB_SHA}
 apiToken:
   songlink: ${SONGLINK_API_TOKEN}
   telegram: ${TELEGRAM_API_TOKEN}

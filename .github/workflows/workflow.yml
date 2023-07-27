@@ -1,10 +1,13 @@
 name: Workflow
-on: [ push ]
+on:
+  push:
+    branches: [ main ]
+  pull_request: { }
 
 jobs:
   lint:
     runs-on: ubuntu-latest
-    container: python:3.11-slim
+    container: python:3.10-slim
     steps:
       - name: Install Poetry
         run: pip install poetry==1.5.1
@@ -13,35 +16,69 @@ jobs:
       - name: Check coding standards
         run: |
           poetry run black --check src/
+          poetry run isort --check-only src/
           poetry run mypy src/
 
-  push_docker:
+  test:
     runs-on: ubuntu-latest
+    container: python:3.10-slim
+    steps:
+      - name: Install Poetry
+        run: pip install poetry==1.5.1
+      - uses: actions/checkout@v3
+      - run: poetry install
+      - name: Run tests
+        run: poetry run pytest src/
+
+  build-container-image:
+    runs-on: ubuntu-latest
+    if: success() && github.event_name == 'pull_request'
     needs:
       - lint
-    if: success() && github.ref == 'refs/heads/main'
+      - test
     steps:
-      - uses: actions/checkout@v3
-      - name: Login to GitHub Container Registry
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4
+      - name: Build container image
+        uses: docker/build-push-action@v4
+        with:
+          push: false
+          tags: "ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}/app:${{ github.sha }}"
+
+  push-container-image:
+    runs-on: ubuntu-latest
+    if: success() && github.ref_name == github.event.repository.default_branch
+    needs:
+      - lint
+      - test
+    steps:
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build the tagged Docker image
-        run: docker build -t ghcr.io/preparingforexams/telegram-songlinker-bot:${GITHUB_SHA} --build-arg "build=${GITHUB_SHA}" .
-      - name: Push the tagged Docker image
-        run: docker push ghcr.io/preparingforexams/telegram-songlinker-bot:${GITHUB_SHA}
+          password: ${{ github.token }}
+      - name: Build and push container image
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: "ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ github.sha }}"
 
   deploy:
     runs-on: ubuntu-latest
-    needs: push_docker
+    needs:
+      - push-container-image
     concurrency: production
     steps:
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4
       - uses: actions/checkout@v3
       - name: Substitute environment variables in values.yaml
         run: "envsubst < values.yaml > values_sub.yaml && mv values_sub.yaml values.yaml"
         env:
+          IMAGE_NAME: "ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}"
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
           SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
@@ -51,3 +88,18 @@ jobs:
         with:
           exec: helm upgrade bot . --install --namespace=telegram-songlinker-bot --atomic
           kubeconfig: '${{ secrets.KUBECONFIG_RAW }}'
+
+  clean:
+    runs-on: ubuntu-latest
+    concurrency: cleanup
+    continue-on-error: true
+    needs: [ deploy ]
+    steps:
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4
+      - name: Clean up old app container images
+        uses: actions/delete-package-versions@v4
+        with:
+          package-name: ${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}
+          package-type: container
+          min-versions-to-keep: 10

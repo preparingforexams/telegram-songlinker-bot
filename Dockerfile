@@ -1,17 +1,24 @@
 FROM python:3.11-slim
 
+RUN useradd --system --create-home --home-dir /app -s /bin/bash app
+USER app
+ENV PATH=$PATH:/app/.local/bin
+
 WORKDIR /app
 
-RUN pip install poetry==1.5.1 --no-cache
-RUN poetry config virtualenvs.create false
+ENV POETRY_VIRTUALENVS_CREATE=false
+
+RUN pip install pipx==1.2.0 --user --no-cache
+RUN pipx install poetry==1.5.1
 
 COPY [ "poetry.toml", "poetry.lock", "pyproject.toml", "./" ]
 
-RUN poetry install --no-dev
+# We don't want the tests
+COPY src/songlinker ./src/songlinker
 
-COPY src .
+RUN poetry install --only main
 
-ARG build
-ENV BUILD_SHA=$build
+ARG APP_VERSION
+ENV BUILD_SHA=$APP_VERSION
 
-ENTRYPOINT [ "python", "-m", "songlinker" ]
+ENTRYPOINT [ "poetry", "run", "python", "-m", "songlinker"  ]
