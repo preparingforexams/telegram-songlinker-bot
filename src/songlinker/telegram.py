@@ -1,12 +1,12 @@
 import logging
 import os
-from typing import Optional, List, Callable
+from typing import Callable, List, Optional
 
-import requests
+import httpx
 
 _API_KEY = os.getenv("TELEGRAM_API_KEY")
 _LOG = logging.getLogger(__name__)
-_session = requests.Session()
+_client = httpx.Client(timeout=30)
 
 
 def check():
@@ -18,7 +18,7 @@ def _build_url(method: str) -> str:
     return f"https://api.telegram.org/bot{_API_KEY}/{method}"
 
 
-def _get_actual_body(response: requests.Response):
+def _get_actual_body(response: httpx.Response):
     response.raise_for_status()
     body = response.json()
     if body.get("ok"):
@@ -34,7 +34,7 @@ def _request_updates(last_update_id: Optional[int]) -> List[dict]:
             "timeout": 10,
         }
     return _get_actual_body(
-        _session.post(
+        _client.post(
             _build_url("getUpdates"),
             json=body,
             timeout=12,
@@ -63,7 +63,7 @@ def send_message(
     disable_notification: bool = False,
 ) -> dict:
     return _get_actual_body(
-        _session.post(
+        _client.post(
             _build_url("sendMessage"),
             json={
                 "chat_id": chat_id,
@@ -73,19 +73,17 @@ def send_message(
                 "disable_web_page_preview": disable_web_page_preview,
                 "text": text,
             },
-            timeout=10,
         )
     )
 
 
 def answer_inline_query(inline_query_id: str | int, results: list):
     return _get_actual_body(
-        _session.post(
+        _client.post(
             _build_url("answerInlineQuery"),
             json={
                 "inline_query_id": inline_query_id,
                 "results": results,
             },
-            timeout=10,
         )
     )

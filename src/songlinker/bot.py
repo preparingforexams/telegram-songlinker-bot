@@ -5,8 +5,7 @@ from dataclasses import dataclass
 from typing import Iterable, Optional
 from urllib import parse
 
-import requests
-from requests import RequestException
+from httpx import Client, HTTPError
 
 from . import telegram
 
@@ -74,7 +73,8 @@ def _handle_query(query: dict) -> None:
         try:
             url = parse.urlparse(query_text)
             if url.scheme == "http" or url.scheme == "https":
-                song_link = _build_link(query_text)
+                with Client(timeout=20) as client:
+                    song_link = _build_link(client, query_text)
         except ValueError:
             pass
     results = [song_link.to_inline_result()] if song_link else []
@@ -111,8 +111,12 @@ def _handle_message(message: dict):
         _LOG.info("No URLs after filtering")
         return
 
-    links = (_build_link(url) for url in urls)
-    message_contents = [link.to_message_content() for link in links if link is not None]
+    with Client(timeout=20) as client:
+        links = (_build_link(client, url) for url in urls)
+        message_contents = [
+            link.to_message_content() for link in links if link is not None
+        ]
+
     if not message_contents:
         _LOG.info("No known songs found")
         return
@@ -130,11 +134,11 @@ def _not_song_link(url: str) -> bool:
     return "song.link" not in url
 
 
-def _build_link(url: str) -> Optional[SongLink]:
+def _build_link(client: Client, url: str) -> Optional[SongLink]:
     params = {"url": url, "userCountry": "DE", "key": _api_key}
 
     try:
-        result = requests.get(_api_base_url, params=params)
+        result = client.get(_api_base_url, params=params)
         if (
             result.status_code == 400
             and result.json()["code"] == "could_not_resolve_entity"
@@ -152,7 +156,7 @@ def _build_link(url: str) -> Optional[SongLink]:
                 return SongLink(bare_url, artist, title)
 
         return SongLink(bare_url)
-    except RequestException as e:
+    except HTTPError as e:
         _LOG.warning("Could not get URL from API", exc_info=e)
         return None
 
