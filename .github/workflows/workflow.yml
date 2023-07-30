@@ -29,6 +29,8 @@ jobs:
       - uses: actions/checkout@v3
       - run: poetry install
       - name: Run tests
+        env:
+          SONGLINK_API_TOKEN: ${{ secrets.SONGLINK_API_TOKEN }}
         run: poetry run pytest -m "integration" src/
 
   unit-test:
