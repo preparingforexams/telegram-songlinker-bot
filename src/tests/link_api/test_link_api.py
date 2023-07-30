@@ -16,7 +16,7 @@ def api_token(require_integration) -> str:
 
 
 @pytest.fixture()
-def link_api(api_token) -> LinkApi:
+def link_api(api_token) -> LinkApi:  # type: ignore
     with LinkApi(api_key=api_token) as api:
         yield api
 
