@@ -10,3 +10,12 @@ lint:
 .PHONY: test
 test:
 	poetry run pytest src/
+
+.PHONY: unit-test
+unit-test:
+	poetry run pytest -m "not integration" src/
+
+.PHONY: integration-test
+integration-test:
+	poetry run pytest -m "integration" src/
+
