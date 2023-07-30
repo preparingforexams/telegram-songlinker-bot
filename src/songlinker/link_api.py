@@ -43,9 +43,8 @@ class LinkResponse(CamelCaseModel):
     links_by_platform: Annotated[dict[str, PlatformLink], Field(min_length=1)]
 
 
-class SongMetadata(BaseModel):
-    title: NonEmptyString
-    artist_name: NonEmptyString | None
+class ErrorResponse(CamelCaseModel):
+    code: NonEmptyString
 
 
 class SongLinks(BaseModel):
@@ -56,6 +55,11 @@ class SongLinks(BaseModel):
     soundcloud: HttpUrl | None
     tidal: HttpUrl | None
     youtube: HttpUrl | None
+
+
+class SongMetadata(BaseModel):
+    title: NonEmptyString
+    artist_name: NonEmptyString | None
 
 
 class SongData(BaseModel):
@@ -117,8 +121,12 @@ class LinkApi:
             return None
         return platform_link.url
 
-    def _parse_response(self, content: bytes) -> SongData:
+    def _parse_response(self, content: bytes) -> SongData | None:
         response = LinkResponse.model_validate_json(content)
+
+        if len(response.entities_by_unique_id) == 1:
+            return None
+
         metadata = self._extract_metadata(
             links_by_platform=response.links_by_platform,
             entities_by_unique_id=response.entities_by_unique_id,
@@ -157,7 +165,17 @@ class LinkApi:
         if response.is_success:
             return self._parse_response(response.content)
         elif 400 <= status_code < 500:
-            raise IoException(f"Client error during request: {status_code}")
+            try:
+                error = ErrorResponse.model_validate_json(response.content)
+                if error.code == "could_not_resolve_entity":
+                    return None
+                else:
+                    raise IoException(
+                        f"Client error during request:"
+                        f" {status_code}, code: {error.code}"
+                    )
+            except ValueError:
+                raise IoException(f"Client error during request: {status_code}")
         elif 500 <= status_code < 600:
             raise IoException(f"Received server error {status_code}")
         else:

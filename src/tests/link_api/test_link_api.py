@@ -1,9 +1,10 @@
 import os
 from unittest.mock import MagicMock
 
+import httpx
 import pytest
 
-from songlinker.link_api import LinkApi
+from songlinker.link_api import LinkApi, IoException
 
 
 @pytest.fixture()
@@ -27,6 +28,27 @@ def test_context_manager__works(mocker):
         close.assert_not_called()
 
     close.assert_called_once()
+
+
+def test_request_io_error(mocker):
+    with LinkApi(api_key="fake") as api:
+        _client = mocker.patch.object(api, "_client")
+        _client.get.side_effect = httpx.RequestError("Test")
+        with pytest.raises(IoException):
+            api.lookup_links("https://open.spotify.com/track/0d28khcov6AiegSCpG5TuT")
+
+
+def test_server_error(mocker):
+    with LinkApi(api_key="fake") as api:
+        _client = mocker.patch.object(api, "_client")
+        response = mocker.MagicMock(
+            spec=httpx.Response,
+            is_success=False,
+            status_code=502,
+        )
+        _client.get.return_value = response
+        with pytest.raises(IoException):
+            api.lookup_links("https://open.spotify.com/track/0d28khcov6AiegSCpG5TuT")
 
 
 @pytest.mark.default_cassette("TestLinkApi.yaml")
@@ -71,8 +93,8 @@ class TestLinkApi:
 
     def test_lookup_youtube_only(self, link_api):
         data = link_api.lookup_links("https://www.youtube.com/watch?v=0_S3ytsXlIA")
-        assert data is not None
+        assert data is None
 
-        assert data.links.youtube
-        assert data.metadata.title == "An Apple"
-        assert data.metadata.artist_name == "tykylevits"
+    def test_lookup_non_song(self, link_api):
+        data = link_api.lookup_links("https://google.com")
+        assert data is None

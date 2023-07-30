@@ -245,4 +245,52 @@ interactions:
       - 15d3a098-80ad-452f-938e-822403968227
     http_version: HTTP/1.1
     status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - api.song.link
+      user-agent:
+      - python-httpx/0.24.1
+    method: GET
+    uri: https://api.song.link/v1-alpha.1/links?songIfSingle=true&url=https%3A%2F%2Fgoogle.com&userCountry=DE
+  response:
+    content: '{"statusCode":400,"code":"could_not_resolve_entity"}'
+    headers:
+      Accept-Ranges:
+      - bytes
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '52'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sun, 30 Jul 2023 16:46:15 GMT
+      Strict-Transport-Security:
+      - max-age=300
+      Vary:
+      - Origin, Accept-Encoding
+      Via:
+      - 1.1 varnish, 1.1 varnish
+      X-Cache:
+      - MISS, MISS
+      X-Cache-Hits:
+      - 0, 0
+      X-Served-By:
+      - cache-sjc1000088-SJC, cache-fra-eddf8230042-FRA
+      X-Timer:
+      - S1690735575.808815,VS0,VE423
+      cache-control:
+      - no-store, max-age=0
+      x-content-matching-id:
+      - 9072f6ef-ab87-49b1-a3cf-5196584e8faa
+    http_version: HTTP/1.1
+    status_code: 400
 version: 1
