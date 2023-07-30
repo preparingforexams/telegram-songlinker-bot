@@ -13,7 +13,7 @@ interactions:
       user-agent:
       - python-httpx/0.24.1
     method: GET
-    uri: https://api.song.link/v1-alpha.1/links?url=https%3A%2F%2Fopen.spotify.com%2Ftrack%2F0SZemtszoaQHL3aUuMS6WF%3Fsi%3D110f087282bd457f&userCountry=DE
+    uri: https://api.song.link/v1-alpha.1/links?songIfSingle=true&url=https%3A%2F%2Fopen.spotify.com%2Ftrack%2F0SZemtszoaQHL3aUuMS6WF&userCountry=DE
   response:
     content: '{"entityUniqueId":"SPOTIFY_SONG::0SZemtszoaQHL3aUuMS6WF","userCountry":"DE","pageUrl":"https://song.link/s/0SZemtszoaQHL3aUuMS6WF","entitiesByUniqueId":{"AMAZON_SONG::B09VK61VGP":{"id":"B09VK61VGP","type":"song","title":"Bum
       Bum Eis","artistName":"Finch, Esther Graf","thumbnailUrl":"https://m.media-amazon.com/images/I/61YjrDfWWjL.jpg","thumbnailWidth":500,"thumbnailHeight":500,"apiProvider":"amazon","platforms":["amazonMusic","amazonStore"]},"AUDIOMACK_SONG::14759085":{"id":"14759085","type":"song","title":"Bum
@@ -43,7 +43,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Sun, 30 Jul 2023 11:07:08 GMT
+      - Sun, 30 Jul 2023 16:37:15 GMT
       Strict-Transport-Security:
       - max-age=300
       Vary:
@@ -55,13 +55,13 @@ interactions:
       X-Cache-Hits:
       - 0, 0
       X-Served-By:
-      - cache-sjc1000141-SJC, cache-fra-eddf8230112-FRA
+      - cache-sjc10055-SJC, cache-muc13938-MUC
       X-Timer:
-      - S1690715228.489800,VS0,VE251
+      - S1690735035.906004,VS0,VE263
       cache-control:
       - no-store, max-age=0
       x-content-matching-id:
-      - e364f99d-82f9-415a-a63b-bd1a808c281e
+      - c52590fd-8fbf-49fd-b3f7-369675c7e952
     http_version: HTTP/1.1
     status_code: 200
 - request:
@@ -78,7 +78,7 @@ interactions:
       user-agent:
       - python-httpx/0.24.1
     method: GET
-    uri: https://api.song.link/v1-alpha.1/links?url=https%3A%2F%2Fopen.spotify.com%2Ftrack%2F0d28khcov6AiegSCpG5TuT%3Fsi%3D49a8f03c107746d4&userCountry=DE
+    uri: https://api.song.link/v1-alpha.1/links?songIfSingle=true&url=https%3A%2F%2Fopen.spotify.com%2Ftrack%2F0d28khcov6AiegSCpG5TuT&userCountry=DE
   response:
     content: '{"entityUniqueId":"SPOTIFY_SONG::0d28khcov6AiegSCpG5TuT","userCountry":"DE","pageUrl":"https://song.link/s/0d28khcov6AiegSCpG5TuT","entitiesByUniqueId":{"AMAZON_SONG::B000TDYS9C":{"id":"B000TDYS9C","type":"song","title":"Feel
       Good Inc","artistName":"Gorillaz","thumbnailUrl":"https://m.media-amazon.com/images/I/51QHFqYpZOL.jpg","thumbnailWidth":500,"thumbnailHeight":500,"apiProvider":"amazon","platforms":["amazonMusic","amazonStore"]},"AUDIOMACK_SONG::10331192":{"id":"10331192","type":"song","title":"Feel
@@ -108,7 +108,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Sun, 30 Jul 2023 11:07:09 GMT
+      - Sun, 30 Jul 2023 16:37:15 GMT
       Strict-Transport-Security:
       - max-age=300
       Vary:
@@ -120,13 +120,13 @@ interactions:
       X-Cache-Hits:
       - 0, 0
       X-Served-By:
-      - cache-sjc1000107-SJC, cache-fra-eddf8230045-FRA
+      - cache-sjc10026-SJC, cache-muc13983-MUC
       X-Timer:
-      - S1690715229.172921,VS0,VE227
+      - S1690735036.526906,VS0,VE303
       cache-control:
       - no-store, max-age=0
       x-content-matching-id:
-      - 7defa958-c79a-4fae-8cd3-5d2d58d5c120
+      - ab42b5a2-2a57-441f-9b79-7942399b1812
     http_version: HTTP/1.1
     status_code: 200
 - request:
@@ -143,24 +143,22 @@ interactions:
       user-agent:
       - python-httpx/0.24.1
     method: GET
-    uri: https://api.song.link/v1-alpha.1/links?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DfJ9rUzIMcZQ%26pp%3DygUGcXVlZW4g&userCountry=DE
+    uri: https://api.song.link/v1-alpha.1/links?songIfSingle=true&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdTAAsCNK7RA&userCountry=DE
   response:
-    content: "{\"entityUniqueId\":\"YOUTUBE_VIDEO::fJ9rUzIMcZQ\",\"userCountry\":\"DE\",\"pageUrl\":\"https://song.link/y/fJ9rUzIMcZQ\",\"entitiesByUniqueId\":{\"AMAZON_SONG::B07H5MZY6H\":{\"id\":\"B07H5MZY6H\",\"type\":\"song\",\"title\":\"Queen
-      Bohemian Rhapsody\",\"artistName\":\"Idol artist\",\"thumbnailUrl\":\"https://m.media-amazon.com/images/I/31hG+MPnreL.jpg\",\"thumbnailWidth\":500,\"thumbnailHeight\":500,\"apiProvider\":\"amazon\",\"platforms\":[\"amazonMusic\",\"amazonStore\"]},\"AUDIUS_SONG::P76oJ\":{\"id\":\"P76oJ\",\"type\":\"song\",\"title\":\"Queen
-      - Bohemian Rhapsody (Official Video)\",\"artistName\":\"Edgar Albornos\",\"thumbnailUrl\":\"https://audius-content-8.cultur3stake.com/content/QmT3QZNSzotW53RQwfJwT7orva5mijKAWvLgC4XngZDb3s/480x480.jpg\",\"thumbnailWidth\":480,\"thumbnailHeight\":480,\"apiProvider\":\"audius\",\"platforms\":[\"audius\"]},\"ANGHAMI_SONG::42332997\":{\"id\":\"42332997\",\"type\":\"song\",\"title\":\"Bohemian
-      Rhapsody\",\"artistName\":\"Queen\",\"thumbnailUrl\":\"https://artwork.anghcdn.co/cover/56325070/320\",\"thumbnailWidth\":1024,\"thumbnailHeight\":1024,\"apiProvider\":\"anghami\",\"platforms\":[\"anghami\"]},\"BOOMPLAY_SONG::2850851\":{\"id\":\"2850851\",\"type\":\"song\",\"title\":\"Bohemian
-      Rhapsody\",\"artistName\":\"Queen\",\"thumbnailUrl\":\"https://source.boomplaymusic.com/group10/M00/08/26/6da6b7173e5c489fb148b39a193c9238_464_464.jpg\",\"thumbnailWidth\":464,\"thumbnailHeight\":464,\"apiProvider\":\"boomplay\",\"platforms\":[\"boomplay\"]},\"DEEZER_SONG::9997018\":{\"id\":\"9997018\",\"type\":\"song\",\"title\":\"Bohemian
-      Rhapsody\",\"artistName\":\"Queen\",\"thumbnailUrl\":\"http://e-cdn-images.deezer.com/images/cover/6706f1154083f461a348508c28030a30/500x500-000000-80-0-0.jpg\",\"thumbnailWidth\":500,\"thumbnailHeight\":500,\"apiProvider\":\"deezer\",\"platforms\":[\"deezer\"]},\"ITUNES_SONG::1435375007\":{\"id\":\"1435375007\",\"type\":\"song\",\"title\":\"Bohemian
-      Rhapsody\",\"artistName\":\"Queen\",\"thumbnailUrl\":\"https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/e8/f1/51/e8f151ae-0f87-a2fd-b981-807a01b24504/18UMGIM55031.rgb.jpg/512x512bb.jpg\",\"thumbnailWidth\":512,\"thumbnailHeight\":512,\"apiProvider\":\"itunes\",\"platforms\":[\"appleMusic\",\"itunes\"]},\"NAPSTER_SONG::tra.55229035\":{\"id\":\"tra.55229035\",\"type\":\"song\",\"title\":\"Bohemian
-      Rhapsody (Remastered 2011)\",\"artistName\":\"Queen\",\"thumbnailUrl\":\"https://direct.rhapsody.com/imageserver/images/alb.55229034/385x385.jpeg\",\"thumbnailWidth\":385,\"thumbnailHeight\":385,\"apiProvider\":\"napster\",\"platforms\":[\"napster\"]},\"PANDORA_SONG::TR:5577522\":{\"id\":\"TR:5577522\",\"type\":\"song\",\"title\":\"Bohemian
-      Rhapsody (Remastered 2011)\",\"artistName\":\"Queen\",\"thumbnailUrl\":\"https://content-images.p-cdn.com/images/25/54/07/93/17e04165a264bf1bf51737e4/_500W_500H.jpg\",\"thumbnailWidth\":500,\"thumbnailHeight\":500,\"apiProvider\":\"pandora\",\"platforms\":[\"pandora\"]},\"SOUNDCLOUD_SONG::1402899469\":{\"id\":\"1402899469\",\"type\":\"song\",\"title\":\"Queen
-      \u2013 Bohemian Rhapsody (Official Video Remastered)\",\"artistName\":\"The
-      PMP\",\"apiProvider\":\"soundcloud\",\"platforms\":[\"soundcloud\"]},\"SPOTIFY_SONG::0lrkMvRttmoXjMNS8YONvj\":{\"id\":\"0lrkMvRttmoXjMNS8YONvj\",\"type\":\"song\",\"title\":\"Bohemian
-      Rhapsody\",\"artistName\":\"Pentatonix\",\"thumbnailUrl\":\"https://i.scdn.co/image/ab67616d0000b2739729d686606e6be27346da30\",\"thumbnailWidth\":640,\"thumbnailHeight\":640,\"apiProvider\":\"spotify\",\"platforms\":[\"spotify\"]},\"TIDAL_SONG::21844140\":{\"id\":\"21844140\",\"type\":\"song\",\"title\":\"Bohemian
-      Rhapsody (Remastered 2011)\",\"artistName\":\"Queen\",\"thumbnailUrl\":\"https://resources.tidal.com/images/bf7f7b17/39ba/45f0/a0ee/97335a706041/640x640.jpg\",\"thumbnailWidth\":640,\"thumbnailHeight\":640,\"apiProvider\":\"tidal\",\"platforms\":[\"tidal\"]},\"YANDEX_SONG::10478608\":{\"id\":\"10478608\",\"type\":\"song\",\"title\":\"Bohemian
-      Rhapsody (In the Style of Queen)\",\"artistName\":\"Original Backing Tracks\",\"thumbnailUrl\":\"https://avatars.yandex.net/get-music-content/28589/611670d9.a.1134786-1/600x600\",\"thumbnailWidth\":600,\"thumbnailHeight\":600,\"apiProvider\":\"yandex\",\"platforms\":[\"yandex\"]},\"YOUTUBE_VIDEO::fJ9rUzIMcZQ\":{\"id\":\"fJ9rUzIMcZQ\",\"type\":\"song\",\"title\":\"Queen
-      \u2013 Bohemian Rhapsody (Official Video Remastered)\",\"artistName\":\"Queen
-      Official\",\"thumbnailUrl\":\"https://i.ytimg.com/vi/fJ9rUzIMcZQ/hqdefault.jpg\",\"thumbnailWidth\":480,\"thumbnailHeight\":360,\"apiProvider\":\"youtube\",\"platforms\":[\"youtube\",\"youtubeMusic\"]}},\"linksByPlatform\":{\"amazonMusic\":{\"country\":\"DE\",\"url\":\"https://music.amazon.com/albums/B07H5PWD4Y?trackAsin=B07H5MZY6H\",\"entityUniqueId\":\"AMAZON_SONG::B07H5MZY6H\"},\"amazonStore\":{\"country\":\"US\",\"url\":\"https://amazon.com/dp/B07H5MZY6H\",\"entityUniqueId\":\"AMAZON_SONG::B07H5MZY6H\"},\"audius\":{\"country\":\"DE\",\"url\":\"https://audius.co/tracks/P76oJ\",\"entityUniqueId\":\"AUDIUS_SONG::P76oJ\"},\"anghami\":{\"country\":\"DE\",\"url\":\"https://play.anghami.com/song/42332997?refer=linktree\",\"entityUniqueId\":\"ANGHAMI_SONG::42332997\"},\"boomplay\":{\"country\":\"DE\",\"url\":\"https://www.boomplay.com/songs/2850851\",\"entityUniqueId\":\"BOOMPLAY_SONG::2850851\"},\"deezer\":{\"country\":\"DE\",\"url\":\"https://www.deezer.com/track/9997018\",\"entityUniqueId\":\"DEEZER_SONG::9997018\"},\"appleMusic\":{\"country\":\"DE\",\"url\":\"https://geo.music.apple.com/de/album/_/1435374593?i=1435375007&mt=1&app=music&ls=1&at=1000lHKX&ct=api_http&itscg=30200&itsct=odsl_m\",\"nativeAppUriMobile\":\"music://itunes.apple.com/de/album/_/1435374593?i=1435375007&mt=1&app=music&ls=1&at=1000lHKX&ct=api_uri_m&itscg=30200&itsct=odsl_m\",\"nativeAppUriDesktop\":\"itmss://itunes.apple.com/de/album/_/1435374593?i=1435375007&mt=1&app=music&ls=1&at=1000lHKX&ct=api_uri_d&itscg=30200&itsct=odsl_m\",\"entityUniqueId\":\"ITUNES_SONG::1435375007\"},\"itunes\":{\"country\":\"DE\",\"url\":\"https://geo.music.apple.com/de/album/_/1435374593?i=1435375007&mt=1&app=itunes&ls=1&at=1000lHKX&ct=api_http&itscg=30200&itsct=odsl_m\",\"nativeAppUriMobile\":\"itmss://itunes.apple.com/de/album/_/1435374593?i=1435375007&mt=1&app=itunes&ls=1&at=1000lHKX&ct=api_uri_m&itscg=30200&itsct=odsl_m\",\"nativeAppUriDesktop\":\"itmss://itunes.apple.com/de/album/_/1435374593?i=1435375007&mt=1&app=itunes&ls=1&at=1000lHKX&ct=api_uri_d&itscg=30200&itsct=odsl_m\",\"entityUniqueId\":\"ITUNES_SONG::1435375007\"},\"napster\":{\"country\":\"DE\",\"url\":\"https://play.napster.com/track/tra.55229035\",\"entityUniqueId\":\"NAPSTER_SONG::tra.55229035\"},\"pandora\":{\"country\":\"US\",\"url\":\"https://www.pandora.com/TR:5577522\",\"entityUniqueId\":\"PANDORA_SONG::TR:5577522\"},\"soundcloud\":{\"country\":\"DE\",\"url\":\"https://soundcloud.com/the-pmp-254834695/queen-bohemian-rhapsody-official-video-remastered\",\"entityUniqueId\":\"SOUNDCLOUD_SONG::1402899469\"},\"spotify\":{\"country\":\"DE\",\"url\":\"https://open.spotify.com/track/0lrkMvRttmoXjMNS8YONvj\",\"nativeAppUriDesktop\":\"spotify:track:0lrkMvRttmoXjMNS8YONvj\",\"entityUniqueId\":\"SPOTIFY_SONG::0lrkMvRttmoXjMNS8YONvj\"},\"tidal\":{\"country\":\"DE\",\"url\":\"https://listen.tidal.com/track/21844140\",\"entityUniqueId\":\"TIDAL_SONG::21844140\"},\"yandex\":{\"country\":\"RU\",\"url\":\"https://music.yandex.ru/track/10478608\",\"entityUniqueId\":\"YANDEX_SONG::10478608\"},\"youtube\":{\"country\":\"DE\",\"url\":\"https://www.youtube.com/watch?v=fJ9rUzIMcZQ\",\"entityUniqueId\":\"YOUTUBE_VIDEO::fJ9rUzIMcZQ\"},\"youtubeMusic\":{\"country\":\"DE\",\"url\":\"https://music.youtube.com/watch?v=fJ9rUzIMcZQ\",\"entityUniqueId\":\"YOUTUBE_VIDEO::fJ9rUzIMcZQ\"}}}"
+    content: '{"entityUniqueId":"YOUTUBE_VIDEO::dTAAsCNK7RA","userCountry":"DE","pageUrl":"https://song.link/y/dTAAsCNK7RA","entitiesByUniqueId":{"AMAZON_SONG::B08CS44BC3":{"id":"B08CS44BC3","type":"song","title":"Here
+      It Goes Again","artistName":"OK Go","thumbnailUrl":"https://m.media-amazon.com/images/I/41abyKRdRTL.jpg","thumbnailWidth":500,"thumbnailHeight":500,"apiProvider":"amazon","platforms":["amazonMusic","amazonStore"]},"AUDIUS_SONG::JboVY":{"id":"JboVY","type":"song","title":"Here
+      it Goes Again","artistName":"EMMBER","thumbnailUrl":"https://cn2.mainnet.audiusindex.org/content/QmbynapmTn4ZBxBdWX3Npjiqtoa4L62z9kt8bSKe1WU6UK/480x480.jpg","thumbnailWidth":480,"thumbnailHeight":480,"apiProvider":"audius","platforms":["audius"]},"ANGHAMI_SONG::915059":{"id":"915059","type":"song","title":"Here
+      It Goes Again","artistName":"OK Go","thumbnailUrl":"https://artwork.anghcdn.co/cover/140841/320","thumbnailWidth":1024,"thumbnailHeight":1024,"apiProvider":"anghami","platforms":["anghami"]},"BOOMPLAY_SONG::2268232":{"id":"2268232","type":"song","title":"Here
+      It Goes Again","artistName":"OK Go","thumbnailUrl":"https://source.boomplaymusic.com/group10/M00/37/4D/f376fb4e1c54486189418a8b3b5d0043_464_464.jpg","thumbnailWidth":464,"thumbnailHeight":464,"apiProvider":"boomplay","platforms":["boomplay"]},"DEEZER_SONG::3093100":{"id":"3093100","type":"song","title":"Here
+      It Goes Again","artistName":"OK Go","thumbnailUrl":"https://cdns-images.dzcdn.net/images/cover/b5534faf0398c8784ae0c83b407a68a8/500x500-000000-80-0-0.jpg","thumbnailWidth":500,"thumbnailHeight":500,"apiProvider":"deezer","platforms":["deezer"]},"ITUNES_SONG::715554157":{"id":"715554157","type":"song","title":"Here
+      It Goes Again","artistName":"OK Go","thumbnailUrl":"https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/ac/5e/44/ac5e44b7-1cc5-ad75-81e4-bdcd45f6d228/13UABIM74024.rgb.jpg/512x512bb.jpg","thumbnailWidth":512,"thumbnailHeight":512,"apiProvider":"itunes","platforms":["appleMusic","itunes"]},"NAPSTER_SONG::tra.406803280":{"id":"tra.406803280","type":"song","title":"Here
+      It Goes Again","artistName":"OK Go","thumbnailUrl":"https://direct.rhapsody.com/imageserver/images/alb.406803279/385x385.jpeg","thumbnailWidth":385,"thumbnailHeight":385,"apiProvider":"napster","platforms":["napster"]},"PANDORA_SONG::TR:709709":{"id":"TR:709709","type":"song","title":"Here
+      It Goes Again","artistName":"OK Go","thumbnailUrl":"https://content-images.p-cdn.com/images/d1/86/bb/a7/f0c4415fa585d5b9989e3ae5/_500W_500H.jpg","thumbnailWidth":500,"thumbnailHeight":500,"apiProvider":"pandora","platforms":["pandora"]},"SOUNDCLOUD_SONG::47297463":{"id":"47297463","type":"song","title":"OkGo
+      - Here it goes again","artistName":"F.A.N.","thumbnailUrl":"https://i1.sndcdn.com/artworks-000023807446-7ionur-t500x500.jpg","thumbnailWidth":500,"thumbnailHeight":500,"apiProvider":"soundcloud","platforms":["soundcloud"]},"SPOTIFY_SONG::1pHP4JeQV9wDx87D6qH9hD":{"id":"1pHP4JeQV9wDx87D6qH9hD","type":"song","title":"Here
+      It Goes Again","artistName":"OK Go","thumbnailUrl":"https://i.scdn.co/image/ab67616d0000b27371e01645abce04dda00e1c0c","thumbnailWidth":640,"thumbnailHeight":640,"apiProvider":"spotify","platforms":["spotify"]},"TIDAL_SONG::1391897":{"id":"1391897","type":"song","title":"Here
+      It Goes Again","artistName":"OK Go","thumbnailUrl":"https://resources.tidal.com/images/268d86d4/a267/4c86/887a/32de391c6c56/640x640.jpg","thumbnailWidth":640,"thumbnailHeight":640,"apiProvider":"tidal","platforms":["tidal"]},"YANDEX_SONG::280571":{"id":"280571","type":"song","title":"Here
+      It Goes Again","artistName":"OK Go","thumbnailUrl":"https://avatars.yandex.net/get-music-content/41288/54893727.a.44554-1/600x600","thumbnailWidth":600,"thumbnailHeight":600,"apiProvider":"yandex","platforms":["yandex"]},"YOUTUBE_VIDEO::dTAAsCNK7RA":{"id":"dTAAsCNK7RA","type":"song","title":"OK
+      Go - Here It Goes Again (Official Music Video)","artistName":"OKGoVEVO","thumbnailUrl":"https://i.ytimg.com/vi/dTAAsCNK7RA/hqdefault.jpg","thumbnailWidth":480,"thumbnailHeight":360,"apiProvider":"youtube","platforms":["youtube","youtubeMusic"]}},"linksByPlatform":{"amazonMusic":{"country":"DE","url":"https://music.amazon.com/albums/B08CS5LR7F?trackAsin=B08CS44BC3","entityUniqueId":"AMAZON_SONG::B08CS44BC3"},"amazonStore":{"country":"US","url":"https://amazon.com/dp/B08CS44BC3","entityUniqueId":"AMAZON_SONG::B08CS44BC3"},"audius":{"country":"DE","url":"https://audius.co/tracks/JboVY","entityUniqueId":"AUDIUS_SONG::JboVY"},"anghami":{"country":"DE","url":"https://play.anghami.com/song/915059?refer=linktree","entityUniqueId":"ANGHAMI_SONG::915059"},"boomplay":{"country":"DE","url":"https://www.boomplay.com/songs/2268232","entityUniqueId":"BOOMPLAY_SONG::2268232"},"deezer":{"country":"DE","url":"https://www.deezer.com/track/3093100","entityUniqueId":"DEEZER_SONG::3093100"},"appleMusic":{"country":"DE","url":"https://geo.music.apple.com/de/album/_/715553799?i=715554157&mt=1&app=music&ls=1&at=1000lHKX&ct=api_http&itscg=30200&itsct=odsl_m","nativeAppUriMobile":"music://itunes.apple.com/de/album/_/715553799?i=715554157&mt=1&app=music&ls=1&at=1000lHKX&ct=api_uri_m&itscg=30200&itsct=odsl_m","nativeAppUriDesktop":"itmss://itunes.apple.com/de/album/_/715553799?i=715554157&mt=1&app=music&ls=1&at=1000lHKX&ct=api_uri_d&itscg=30200&itsct=odsl_m","entityUniqueId":"ITUNES_SONG::715554157"},"itunes":{"country":"DE","url":"https://geo.music.apple.com/de/album/_/715553799?i=715554157&mt=1&app=itunes&ls=1&at=1000lHKX&ct=api_http&itscg=30200&itsct=odsl_m","nativeAppUriMobile":"itmss://itunes.apple.com/de/album/_/715553799?i=715554157&mt=1&app=itunes&ls=1&at=1000lHKX&ct=api_uri_m&itscg=30200&itsct=odsl_m","nativeAppUriDesktop":"itmss://itunes.apple.com/de/album/_/715553799?i=715554157&mt=1&app=itunes&ls=1&at=1000lHKX&ct=api_uri_d&itscg=30200&itsct=odsl_m","entityUniqueId":"ITUNES_SONG::715554157"},"napster":{"country":"DE","url":"https://play.napster.com/track/tra.406803280","entityUniqueId":"NAPSTER_SONG::tra.406803280"},"pandora":{"country":"US","url":"https://www.pandora.com/TR:709709","entityUniqueId":"PANDORA_SONG::TR:709709"},"soundcloud":{"country":"DE","url":"https://soundcloud.com/fanband/okgo-here-it-goes-again","entityUniqueId":"SOUNDCLOUD_SONG::47297463"},"spotify":{"country":"DE","url":"https://open.spotify.com/track/1pHP4JeQV9wDx87D6qH9hD","nativeAppUriDesktop":"spotify:track:1pHP4JeQV9wDx87D6qH9hD","entityUniqueId":"SPOTIFY_SONG::1pHP4JeQV9wDx87D6qH9hD"},"tidal":{"country":"DE","url":"https://listen.tidal.com/track/1391897","entityUniqueId":"TIDAL_SONG::1391897"},"yandex":{"country":"RU","url":"https://music.yandex.ru/track/280571","entityUniqueId":"YANDEX_SONG::280571"},"youtube":{"country":"DE","url":"https://www.youtube.com/watch?v=dTAAsCNK7RA","entityUniqueId":"YOUTUBE_VIDEO::dTAAsCNK7RA"},"youtubeMusic":{"country":"DE","url":"https://music.youtube.com/watch?v=dTAAsCNK7RA","entityUniqueId":"YOUTUBE_VIDEO::dTAAsCNK7RA"}}}'
     headers:
       Accept-Ranges:
       - bytes
@@ -171,11 +169,11 @@ interactions:
       Content-Encoding:
       - gzip
       Content-Length:
-      - '1978'
+      - '1912'
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Sun, 30 Jul 2023 11:07:10 GMT
+      - Sun, 30 Jul 2023 16:37:16 GMT
       Strict-Transport-Security:
       - max-age=300
       Vary:
@@ -187,13 +185,64 @@ interactions:
       X-Cache-Hits:
       - 0, 0
       X-Served-By:
-      - cache-sjc1000133-SJC, cache-fra-eddf8230071-FRA
+      - cache-sjc10052-SJC, cache-muc13947-MUC
       X-Timer:
-      - S1690715230.975678,VS0,VE229
+      - S1690735036.964640,VS0,VE232
       cache-control:
       - no-store, max-age=0
       x-content-matching-id:
-      - 9eb5bcd0-283e-4032-9543-137b2c17b0cf
+      - cf04576d-c965-4606-a59e-dce00c1cc026
+    http_version: HTTP/1.1
+    status_code: 200
+- request:
+    body: ''
+    headers:
+      accept:
+      - '*/*'
+      accept-encoding:
+      - gzip, deflate
+      connection:
+      - keep-alive
+      host:
+      - api.song.link
+      user-agent:
+      - python-httpx/0.24.1
+    method: GET
+    uri: https://api.song.link/v1-alpha.1/links?songIfSingle=true&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D0_S3ytsXlIA&userCountry=DE
+  response:
+    content: '{"entityUniqueId":"YOUTUBE_VIDEO::0_S3ytsXlIA","userCountry":"DE","pageUrl":"https://song.link/y/0_S3ytsXlIA","entitiesByUniqueId":{"YOUTUBE_VIDEO::0_S3ytsXlIA":{"id":"0_S3ytsXlIA","type":"song","title":"An
+      Apple","artistName":"tykylevits","thumbnailUrl":"https://i.ytimg.com/vi/0_S3ytsXlIA/hqdefault.jpg","thumbnailWidth":480,"thumbnailHeight":360,"apiProvider":"youtube","platforms":["youtube","youtubeMusic"]}},"linksByPlatform":{"youtube":{"country":"DE","url":"https://www.youtube.com/watch?v=0_S3ytsXlIA","entityUniqueId":"YOUTUBE_VIDEO::0_S3ytsXlIA"},"youtubeMusic":{"country":"DE","url":"https://music.youtube.com/watch?v=0_S3ytsXlIA","entityUniqueId":"YOUTUBE_VIDEO::0_S3ytsXlIA"}}}'
+    headers:
+      Accept-Ranges:
+      - bytes
+      Age:
+      - '0'
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '691'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sun, 30 Jul 2023 16:37:16 GMT
+      Strict-Transport-Security:
+      - max-age=300
+      Vary:
+      - Origin, Accept-Encoding
+      Via:
+      - 1.1 varnish, 1.1 varnish
+      X-Cache:
+      - MISS, MISS
+      X-Cache-Hits:
+      - 0, 0
+      X-Served-By:
+      - cache-sjc10033-SJC, cache-muc13948-MUC
+      X-Timer:
+      - S1690735036.494693,VS0,VE377
+      cache-control:
+      - no-store, max-age=0
+      x-content-matching-id:
+      - 15d3a098-80ad-452f-938e-822403968227
     http_version: HTTP/1.1
     status_code: 200
 version: 1

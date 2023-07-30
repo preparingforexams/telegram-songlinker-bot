@@ -1,7 +1,7 @@
-from typing import Self
+from typing import Annotated, Self
 
 import httpx
-from pydantic import BaseModel, ConfigDict, HttpUrl
+from pydantic import AnyUrl, BaseModel, ConfigDict, Field, HttpUrl
 from pydantic.alias_generators import to_camel
 
 
@@ -9,14 +9,43 @@ class CamelCaseModel(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel)
 
 
+UniqueEntityId = Annotated[
+    str,
+    Field(
+        min_length=1,
+        pattern=r"[A-Z_]+::.+",
+    ),
+]
+
+NonEmptyString = Annotated[str, Field(min_length=1)]
+
+
+class PlatformMetadata(CamelCaseModel):
+    type: str
+    title: str
+    artist_name: str
+    api_provider: str
+    platforms: Annotated[list[str], Field(min_length=1)]
+
+
 class PlatformLink(CamelCaseModel):
+    entity_unique_id: UniqueEntityId
     url: HttpUrl
-    entity_unique_id: str
+    native_app_uri_desktop: AnyUrl | None = None
+    native_app_uri_mobile: AnyUrl | None = None
 
 
 class LinkResponse(CamelCaseModel):
     page_url: HttpUrl
-    links_by_platform: dict[str, PlatformLink]
+    entities_by_unique_id: Annotated[
+        dict[UniqueEntityId, PlatformMetadata], Field(min_length=1)
+    ]
+    links_by_platform: Annotated[dict[str, PlatformLink], Field(min_length=1)]
+
+
+class SongMetadata(BaseModel):
+    title: NonEmptyString
+    artist_name: NonEmptyString | None
 
 
 class SongLinks(BaseModel):
@@ -27,6 +56,11 @@ class SongLinks(BaseModel):
     soundcloud: HttpUrl | None
     tidal: HttpUrl | None
     youtube: HttpUrl | None
+
+
+class SongData(BaseModel):
+    links: SongLinks
+    metadata: SongMetadata
 
 
 class IoException(Exception):
@@ -49,6 +83,30 @@ class LinkApi:
     def close(self):
         self._client.close()
 
+    def _extract_metadata(
+        self,
+        links_by_platform: dict[str, PlatformLink],
+        entities_by_unique_id: dict[str, PlatformMetadata],
+    ) -> SongMetadata:
+        entity: PlatformMetadata
+        for platform in ("spotify", "tidal", "appleMusic", "soundcloud", "youtube"):
+            # first try our preferred providers
+            link = links_by_platform.get(platform)
+            if link is None:
+                continue
+
+            entity_id = link.entity_unique_id
+            entity = entities_by_unique_id[entity_id]
+            break
+        else:
+            # If no preferred provider was found, use the first one
+            _, entity = entities_by_unique_id.popitem()
+
+        return SongMetadata(
+            title=entity.title,
+            artist_name=entity.artist_name,
+        )
+
     def _extract_url(
         self,
         links_by_platform: dict[str, PlatformLink],
@@ -59,9 +117,13 @@ class LinkApi:
             return None
         return platform_link.url
 
-    def _parse_response(self, content: bytes) -> SongLinks:
+    def _parse_response(self, content: bytes) -> SongData:
         response = LinkResponse.model_validate_json(content)
-        result = SongLinks(
+        metadata = self._extract_metadata(
+            links_by_platform=response.links_by_platform,
+            entities_by_unique_id=response.entities_by_unique_id,
+        )
+        links = SongLinks(
             page=response.page_url,
             apple_music=self._extract_url(response.links_by_platform, "appleMusic"),
             deezer=self._extract_url(response.links_by_platform, "deezer"),
@@ -70,15 +132,21 @@ class LinkApi:
             tidal=self._extract_url(response.links_by_platform, "tidal"),
             youtube=self._extract_url(response.links_by_platform, "youtube"),
         )
-        return SongLinks.model_validate(result)
+        return SongData.model_validate(
+            SongData(
+                metadata=metadata,
+                links=links,
+            )
+        )
 
-    def lookup_links(self, url: str) -> SongLinks | None:
+    def lookup_links(self, url: str) -> SongData | None:
         try:
             response = self._client.get(
                 url=self.BASE_URL,
                 params={
                     "url": url,
                     "userCountry": "DE",
+                    "songIfSingle": "true",
                     "key": self._api_key,
                 },
             )

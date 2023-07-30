@@ -34,20 +34,45 @@ def test_context_manager__works(mocker):
 @pytest.mark.vcr
 class TestLinkApi:
     @pytest.mark.parametrize(
-        "url",
+        "url,title,artist",
         [
-            "https://open.spotify.com/track/0SZemtszoaQHL3aUuMS6WF?si=110f087282bd457f",
-            "https://open.spotify.com/track/0d28khcov6AiegSCpG5TuT?si=49a8f03c107746d4",
-            "https://www.youtube.com/watch?v=fJ9rUzIMcZQ&pp=ygUGcXVlZW4g",
+            (
+                "https://open.spotify.com/track/0SZemtszoaQHL3aUuMS6WF",
+                "Bum Bum Eis",
+                "FiNCH, Esther Graf",
+            ),
+            (
+                "https://open.spotify.com/track/0d28khcov6AiegSCpG5TuT",
+                "Feel Good Inc.",
+                "Gorillaz",
+            ),
+            (
+                "https://www.youtube.com/watch?v=dTAAsCNK7RA",
+                "Here It Goes Again",
+                "OK Go",
+            ),
         ],
     )
-    def test_lookup_links_has_all_links(self, link_api, url):
-        response = link_api.lookup_links(url)
-        assert response is not None
+    def test_lookup_links_has_all_links(self, link_api, url, title, artist):
+        data = link_api.lookup_links(url)
+        assert data is not None
 
-        assert response.apple_music
-        assert response.deezer
-        assert response.spotify
-        assert response.soundcloud
-        assert response.tidal
-        assert response.youtube
+        links = data.links
+        assert links.apple_music
+        assert links.deezer
+        assert links.spotify
+        assert links.soundcloud
+        assert links.tidal
+        assert links.youtube
+
+        metadata = data.metadata
+        assert metadata.title == title
+        assert metadata.artist_name == artist
+
+    def test_lookup_youtube_only(self, link_api):
+        data = link_api.lookup_links("https://www.youtube.com/watch?v=0_S3ytsXlIA")
+        assert data is not None
+
+        assert data.links.youtube
+        assert data.metadata.title == "An Apple"
+        assert data.metadata.artist_name == "tykylevits"
