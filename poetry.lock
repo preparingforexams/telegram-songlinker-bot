@@ -32,6 +32,24 @@ test = ["anyio[trio]", "coverage[toml] (>=4.5)", "hypothesis (>=4.0)", "mock (>=
 trio = ["trio (<0.22)"]
 
 [[package]]
+name = "attrs"
+version = "23.1.0"
+description = "Classes Without Boilerplate"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "attrs-23.1.0-py3-none-any.whl", hash = "sha256:1f28b4522cdc2fb4256ac1a020c78acf9cba2c6b461ccd2c126f3aa8e8335d04"},
+    {file = "attrs-23.1.0.tar.gz", hash = "sha256:6279836d581513a26f1bf235f9acd333bc9115683f14f7e8fae46c98fc50e015"},
+]
+
+[package.extras]
+cov = ["attrs[tests]", "coverage[toml] (>=5.3)"]
+dev = ["attrs[docs,tests]", "pre-commit"]
+docs = ["furo", "myst-parser", "sphinx", "sphinx-notfound-page", "sphinxcontrib-towncrier", "towncrier", "zope-interface"]
+tests = ["attrs[tests-no-zope]", "zope-interface"]
+tests-no-zope = ["cloudpickle", "hypothesis", "mypy (>=1.1.1)", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins", "pytest-xdist[psutil]"]
+
+[[package]]
 name = "black"
 version = "23.7.0"
 description = "The uncompromising code formatter."
@@ -566,6 +584,22 @@ pytest = ">=5.0"
 dev = ["pre-commit", "pytest-asyncio", "tox"]
 
 [[package]]
+name = "pytest-recording"
+version = "0.12.2"
+description = "A pytest plugin that allows you recording of network interactions via VCR.py"
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "pytest-recording-0.12.2.tar.gz", hash = "sha256:7c8949c24e5546a699f8fbbff0c5d6896cd09463378ac3d3f1ebb110d2186847"},
+    {file = "pytest_recording-0.12.2-py3-none-any.whl", hash = "sha256:f055f97eb98bbefd0453a7796aa3a6833502c173421928b9d878cf1420b36406"},
+]
+
+[package.dependencies]
+attrs = "*"
+pytest = ">=3.5.0"
+vcrpy = ">=2.0.1"
+
+[[package]]
 name = "pyyaml"
 version = "6.0.1"
 description = "YAML parser and emitter for Python"
@@ -708,13 +742,13 @@ zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
 name = "vcrpy"
-version = "5.0.0"
+version = "4.4.0"
 description = "Automatically mock your HTTP interactions to simplify and speed up testing"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.7"
 files = [
-    {file = "vcrpy-5.0.0-py2.py3-none-any.whl", hash = "sha256:28b66c87be7678896e9e78fee4f6695e3fb153d5d7e5f635416a33658452bb44"},
-    {file = "vcrpy-5.0.0.tar.gz", hash = "sha256:1ef3ddea819a26eda10b560c70bd74c41855241d431745712e31a5b2de2d05a8"},
+    {file = "vcrpy-4.4.0-py2.py3-none-any.whl", hash = "sha256:560c9d0d8436ced29223ceefb513c3ac3f2e2a60d51a9830f236a1e63167905a"},
+    {file = "vcrpy-4.4.0.tar.gz", hash = "sha256:d1109ae93dbc2e7fcbc485849a7600d5dea510d3bef070eec4419c9a72ca2639"},
 ]
 
 [package.dependencies]
@@ -897,4 +931,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.11"
-content-hash = "5e1983edd237f9af7be7a7a9fa42fb58617772cac5b5bd3e576e209b6cb80dfe"
+content-hash = "51624d2712c9bdac084f3cbc63a247e7d04683d85a88d974c8485985e7bbac53"

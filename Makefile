@@ -9,7 +9,7 @@ lint:
 
 .PHONY: test
 test:
-	poetry run pytest src/
+	poetry run pytest --record-mode=new_episodes src/
 
 .PHONY: unit-test
 unit-test:
@@ -17,5 +17,5 @@ unit-test:
 
 .PHONY: integration-test
 integration-test:
-	poetry run pytest -m "integration" src/
+	poetry run pytest -m "integration" --record-mode=new_episodes src/
 

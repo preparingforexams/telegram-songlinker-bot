@@ -13,7 +13,7 @@ interactions:
       user-agent:
       - python-httpx/0.24.1
     method: GET
-    uri: https://api.song.link/v1-alpha.1/links?url=https%3A//open.spotify.com/track/0SZemtszoaQHL3aUuMS6WF%3Fsi%3D110f087282bd457f&userCountry=DE&key=8fb8352b-3494-400b-b8d2-a802d95fcd33
+    uri: https://api.song.link/v1-alpha.1/links?url=https%3A%2F%2Fopen.spotify.com%2Ftrack%2F0SZemtszoaQHL3aUuMS6WF%3Fsi%3D110f087282bd457f&userCountry=DE
   response:
     content: '{"entityUniqueId":"SPOTIFY_SONG::0SZemtszoaQHL3aUuMS6WF","userCountry":"DE","pageUrl":"https://song.link/s/0SZemtszoaQHL3aUuMS6WF","entitiesByUniqueId":{"AMAZON_SONG::B09VK61VGP":{"id":"B09VK61VGP","type":"song","title":"Bum
       Bum Eis","artistName":"Finch, Esther Graf","thumbnailUrl":"https://m.media-amazon.com/images/I/61YjrDfWWjL.jpg","thumbnailWidth":500,"thumbnailHeight":500,"apiProvider":"amazon","platforms":["amazonMusic","amazonStore"]},"AUDIOMACK_SONG::14759085":{"id":"14759085","type":"song","title":"Bum
@@ -43,7 +43,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Sun, 30 Jul 2023 10:00:41 GMT
+      - Sun, 30 Jul 2023 11:07:08 GMT
       Strict-Transport-Security:
       - max-age=300
       Vary:
@@ -55,13 +55,13 @@ interactions:
       X-Cache-Hits:
       - 0, 0
       X-Served-By:
-      - cache-sjc1000141-SJC, cache-fra-eddf8230080-FRA
+      - cache-sjc1000141-SJC, cache-fra-eddf8230112-FRA
       X-Timer:
-      - S1690711242.659905,VS0,VE244
+      - S1690715228.489800,VS0,VE251
       cache-control:
       - no-store, max-age=0
       x-content-matching-id:
-      - 976ee83e-5eab-4127-8bbd-f19c66cf4541
+      - e364f99d-82f9-415a-a63b-bd1a808c281e
     http_version: HTTP/1.1
     status_code: 200
 - request:
@@ -78,72 +78,7 @@ interactions:
       user-agent:
       - python-httpx/0.24.1
     method: GET
-    uri: https://api.song.link/v1-alpha.1/links?url=https%3A//open.spotify.com/track/0SZemtszoaQHL3aUuMS6WF%3Fsi%3D110f087282bd457f&userCountry=DE&key=8fb8352b-3494-400b-b8d2-a802d95fcd33
-  response:
-    content: '{"entityUniqueId":"SPOTIFY_SONG::0SZemtszoaQHL3aUuMS6WF","userCountry":"DE","pageUrl":"https://song.link/s/0SZemtszoaQHL3aUuMS6WF","entitiesByUniqueId":{"AMAZON_SONG::B09VK61VGP":{"id":"B09VK61VGP","type":"song","title":"Bum
-      Bum Eis","artistName":"Finch, Esther Graf","thumbnailUrl":"https://m.media-amazon.com/images/I/61YjrDfWWjL.jpg","thumbnailWidth":500,"thumbnailHeight":500,"apiProvider":"amazon","platforms":["amazonMusic","amazonStore"]},"AUDIOMACK_SONG::14759085":{"id":"14759085","type":"song","title":"Bum
-      Bum Eis","artistName":"FiNCH, Esther Graf","thumbnailUrl":"https://assets.audiomack.com/finch-music/8339c1571990484f67e1c077c26c6d1098fb537d0139d852fcc4a6e69e715875.jpeg?width=500&height=500&max=true","thumbnailWidth":500,"thumbnailHeight":500,"apiProvider":"audiomack","platforms":["audiomack"]},"ANGHAMI_SONG::1026703116":{"id":"1026703116","type":"song","title":"Bum
-      Bum Eis","artistName":"FiNCH & Esther Graf","thumbnailUrl":"https://artwork.anghcdn.co/cover/145396896/320","thumbnailWidth":1024,"thumbnailHeight":1024,"apiProvider":"anghami","platforms":["anghami"]},"BOOMPLAY_SONG::68413951":{"id":"68413951","type":"song","title":"Bum
-      Bum Eis ft. Esther Graf","artistName":"FiNCH","thumbnailUrl":"https://source.boomplaymusic.com/group10/M00/08/19/c869aa71589041829c763562a3bcc941_464_464.jpg","thumbnailWidth":464,"thumbnailHeight":464,"apiProvider":"boomplay","platforms":["boomplay"]},"DEEZER_SONG::1463179302":{"id":"1463179302","type":"song","title":"Bum
-      Bum Eis","artistName":"FiNCH, Esther Graf","thumbnailUrl":"https://cdns-images.dzcdn.net/images/cover/a2aa84c9df2bc38de965b13832693c71/500x500-000000-80-0-0.jpg","thumbnailWidth":500,"thumbnailHeight":500,"apiProvider":"deezer","platforms":["deezer"]},"ITUNES_SONG::1560859189":{"id":"1560859189","type":"song","title":"Bum
-      Bum Eis","artistName":"FiNCH & Esther Graf","thumbnailUrl":"https://is3-ssl.mzstatic.com/image/thumb/Music126/v4/d2/59/fb/d259fb5f-67b7-05ba-f7e6-9367c8590d46/21UMGIM27082.rgb.jpg/512x512bb.jpg","thumbnailWidth":512,"thumbnailHeight":512,"apiProvider":"itunes","platforms":["appleMusic","itunes"]},"NAPSTER_SONG::tra.663561249":{"id":"tra.663561249","type":"song","title":"Bum
-      Bum Eis","artistName":"FiNCH","thumbnailUrl":"https://direct.rhapsody.com/imageserver/images/alb.663560855/385x385.jpeg","thumbnailWidth":385,"thumbnailHeight":385,"apiProvider":"napster","platforms":["napster"]},"PANDORA_SONG::TR:48137919":{"id":"TR:48137919","type":"song","title":"Bum
-      Bum Eis","artistName":"FiNCH & Esther Graf","thumbnailUrl":"https://content-images.p-cdn.com/images/d8/63/e5/2c/801949888bb8c1efea664902/_500W_500H.jpg","thumbnailWidth":500,"thumbnailHeight":500,"apiProvider":"pandora","platforms":["pandora"]},"SOUNDCLOUD_SONG::1108926070":{"id":"1108926070","type":"song","title":"Bum
-      Bum Eis","artistName":"FiNCH","thumbnailUrl":"https://i1.sndcdn.com/artworks-Sw22K0l921kJ-0-t500x500.jpg","thumbnailWidth":500,"thumbnailHeight":500,"apiProvider":"soundcloud","platforms":["soundcloud"]},"SPOTIFY_SONG::0SZemtszoaQHL3aUuMS6WF":{"id":"0SZemtszoaQHL3aUuMS6WF","type":"song","title":"Bum
-      Bum Eis","artistName":"FiNCH, Esther Graf","thumbnailUrl":"https://i.scdn.co/image/ab67616d0000b273d777911fff2753b3e26bb5ab","thumbnailWidth":640,"thumbnailHeight":640,"apiProvider":"spotify","platforms":["spotify"]},"TIDAL_SONG::194058552":{"id":"194058552","type":"song","title":"Bum
-      Bum Eis","artistName":"FiNCH, Esther Graf","thumbnailUrl":"https://resources.tidal.com/images/a79beaab/778f/4e6a/9229/2481917af0fc/640x640.jpg","thumbnailWidth":640,"thumbnailHeight":640,"apiProvider":"tidal","platforms":["tidal"]},"YANDEX_SONG::89268989":{"id":"89268989","type":"song","title":"Bum
-      Bum Eis","artistName":"FiNCH, Esther Graf","thumbnailUrl":"https://avatars.yandex.net/get-music-content/5531900/92f91252.a.21321324-1/600x600","thumbnailWidth":600,"thumbnailHeight":600,"apiProvider":"yandex","platforms":["yandex"]},"YOUTUBE_VIDEO::UCHsmR5KAAM":{"id":"UCHsmR5KAAM","type":"song","title":"Bum
-      Bum Eis","artistName":"FiNCH - Topic","thumbnailUrl":"https://i.ytimg.com/vi/UCHsmR5KAAM/hqdefault.jpg","thumbnailWidth":480,"thumbnailHeight":360,"apiProvider":"youtube","platforms":["youtube","youtubeMusic"]}},"linksByPlatform":{"amazonMusic":{"country":"DE","url":"https://music.amazon.com/albums/B09VK99KF5?trackAsin=B09VK61VGP","entityUniqueId":"AMAZON_SONG::B09VK61VGP"},"amazonStore":{"country":"US","url":"https://amazon.com/dp/B09VK61VGP","entityUniqueId":"AMAZON_SONG::B09VK61VGP"},"audiomack":{"country":"DE","url":"https://audiomack.com/song/finch-music/bum-bum-eis","entityUniqueId":"AUDIOMACK_SONG::14759085"},"anghami":{"country":"DE","url":"https://play.anghami.com/song/1026703116?refer=linktree","entityUniqueId":"ANGHAMI_SONG::1026703116"},"boomplay":{"country":"DE","url":"https://www.boomplay.com/songs/68413951","entityUniqueId":"BOOMPLAY_SONG::68413951"},"deezer":{"country":"DE","url":"https://www.deezer.com/track/1463179302","entityUniqueId":"DEEZER_SONG::1463179302"},"appleMusic":{"country":"DE","url":"https://geo.music.apple.com/de/album/_/1560859042?i=1560859189&mt=1&app=music&ls=1&at=1000lHKX&ct=api_http&itscg=30200&itsct=odsl_m","nativeAppUriMobile":"music://itunes.apple.com/de/album/_/1560859042?i=1560859189&mt=1&app=music&ls=1&at=1000lHKX&ct=api_uri_m&itscg=30200&itsct=odsl_m","nativeAppUriDesktop":"itmss://itunes.apple.com/de/album/_/1560859042?i=1560859189&mt=1&app=music&ls=1&at=1000lHKX&ct=api_uri_d&itscg=30200&itsct=odsl_m","entityUniqueId":"ITUNES_SONG::1560859189"},"itunes":{"country":"DE","url":"https://geo.music.apple.com/de/album/_/1560859042?i=1560859189&mt=1&app=itunes&ls=1&at=1000lHKX&ct=api_http&itscg=30200&itsct=odsl_m","nativeAppUriMobile":"itmss://itunes.apple.com/de/album/_/1560859042?i=1560859189&mt=1&app=itunes&ls=1&at=1000lHKX&ct=api_uri_m&itscg=30200&itsct=odsl_m","nativeAppUriDesktop":"itmss://itunes.apple.com/de/album/_/1560859042?i=1560859189&mt=1&app=itunes&ls=1&at=1000lHKX&ct=api_uri_d&itscg=30200&itsct=odsl_m","entityUniqueId":"ITUNES_SONG::1560859189"},"napster":{"country":"DE","url":"https://play.napster.com/track/tra.663561249","entityUniqueId":"NAPSTER_SONG::tra.663561249"},"pandora":{"country":"US","url":"https://www.pandora.com/TR:48137919","entityUniqueId":"PANDORA_SONG::TR:48137919"},"soundcloud":{"country":"DE","url":"https://soundcloud.com/finch-sc/bum-bum-eis","entityUniqueId":"SOUNDCLOUD_SONG::1108926070"},"tidal":{"country":"DE","url":"https://listen.tidal.com/track/194058552","entityUniqueId":"TIDAL_SONG::194058552"},"yandex":{"country":"RU","url":"https://music.yandex.ru/track/89268989","entityUniqueId":"YANDEX_SONG::89268989"},"youtube":{"country":"DE","url":"https://www.youtube.com/watch?v=UCHsmR5KAAM","entityUniqueId":"YOUTUBE_VIDEO::UCHsmR5KAAM"},"youtubeMusic":{"country":"DE","url":"https://music.youtube.com/watch?v=UCHsmR5KAAM","entityUniqueId":"YOUTUBE_VIDEO::UCHsmR5KAAM"},"spotify":{"country":"DE","url":"https://open.spotify.com/track/0SZemtszoaQHL3aUuMS6WF","nativeAppUriDesktop":"spotify:track:0SZemtszoaQHL3aUuMS6WF","entityUniqueId":"SPOTIFY_SONG::0SZemtszoaQHL3aUuMS6WF"}}}'
-    headers:
-      Accept-Ranges:
-      - bytes
-      Age:
-      - '0'
-      Connection:
-      - keep-alive
-      Content-Encoding:
-      - gzip
-      Content-Length:
-      - '1893'
-      Content-Type:
-      - application/json; charset=utf-8
-      Date:
-      - Sun, 30 Jul 2023 10:02:20 GMT
-      Strict-Transport-Security:
-      - max-age=300
-      Vary:
-      - Origin, Accept-Encoding
-      Via:
-      - 1.1 varnish, 1.1 varnish
-      X-Cache:
-      - MISS, MISS
-      X-Cache-Hits:
-      - 0, 0
-      X-Served-By:
-      - cache-sjc1000141-SJC, cache-muc13964-MUC
-      X-Timer:
-      - S1690711340.044779,VS0,VE470
-      cache-control:
-      - no-store, max-age=0
-      x-content-matching-id:
-      - c1176409-aca7-401e-9b13-ee2e0a0c653e
-    http_version: HTTP/1.1
-    status_code: 200
-- request:
-    body: ''
-    headers:
-      accept:
-      - '*/*'
-      accept-encoding:
-      - gzip, deflate
-      connection:
-      - keep-alive
-      host:
-      - api.song.link
-      user-agent:
-      - python-httpx/0.24.1
-    method: GET
-    uri: https://api.song.link/v1-alpha.1/links?url=https%3A//open.spotify.com/track/0d28khcov6AiegSCpG5TuT%3Fsi%3D49a8f03c107746d4&userCountry=DE&key=8fb8352b-3494-400b-b8d2-a802d95fcd33
+    uri: https://api.song.link/v1-alpha.1/links?url=https%3A%2F%2Fopen.spotify.com%2Ftrack%2F0d28khcov6AiegSCpG5TuT%3Fsi%3D49a8f03c107746d4&userCountry=DE
   response:
     content: '{"entityUniqueId":"SPOTIFY_SONG::0d28khcov6AiegSCpG5TuT","userCountry":"DE","pageUrl":"https://song.link/s/0d28khcov6AiegSCpG5TuT","entitiesByUniqueId":{"AMAZON_SONG::B000TDYS9C":{"id":"B000TDYS9C","type":"song","title":"Feel
       Good Inc","artistName":"Gorillaz","thumbnailUrl":"https://m.media-amazon.com/images/I/51QHFqYpZOL.jpg","thumbnailWidth":500,"thumbnailHeight":500,"apiProvider":"amazon","platforms":["amazonMusic","amazonStore"]},"AUDIOMACK_SONG::10331192":{"id":"10331192","type":"song","title":"Feel
@@ -173,7 +108,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Sun, 30 Jul 2023 10:02:28 GMT
+      - Sun, 30 Jul 2023 11:07:09 GMT
       Strict-Transport-Security:
       - max-age=300
       Vary:
@@ -185,13 +120,13 @@ interactions:
       X-Cache-Hits:
       - 0, 0
       X-Served-By:
-      - cache-sjc1000107-SJC, cache-muc13975-MUC
+      - cache-sjc1000107-SJC, cache-fra-eddf8230045-FRA
       X-Timer:
-      - S1690711345.255481,VS0,VE3703
+      - S1690715229.172921,VS0,VE227
       cache-control:
       - no-store, max-age=0
       x-content-matching-id:
-      - 2aadcd41-8b64-4f2c-b668-d2eed0935dcf
+      - 7defa958-c79a-4fae-8cd3-5d2d58d5c120
     http_version: HTTP/1.1
     status_code: 200
 - request:
@@ -208,7 +143,7 @@ interactions:
       user-agent:
       - python-httpx/0.24.1
     method: GET
-    uri: https://api.song.link/v1-alpha.1/links?url=https%3A//www.youtube.com/watch%3Fv%3DfJ9rUzIMcZQ%26pp%3DygUGcXVlZW4g&userCountry=DE&key=8fb8352b-3494-400b-b8d2-a802d95fcd33
+    uri: https://api.song.link/v1-alpha.1/links?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DfJ9rUzIMcZQ%26pp%3DygUGcXVlZW4g&userCountry=DE
   response:
     content: "{\"entityUniqueId\":\"YOUTUBE_VIDEO::fJ9rUzIMcZQ\",\"userCountry\":\"DE\",\"pageUrl\":\"https://song.link/y/fJ9rUzIMcZQ\",\"entitiesByUniqueId\":{\"AMAZON_SONG::B07H5MZY6H\":{\"id\":\"B07H5MZY6H\",\"type\":\"song\",\"title\":\"Queen
       Bohemian Rhapsody\",\"artistName\":\"Idol artist\",\"thumbnailUrl\":\"https://m.media-amazon.com/images/I/31hG+MPnreL.jpg\",\"thumbnailWidth\":500,\"thumbnailHeight\":500,\"apiProvider\":\"amazon\",\"platforms\":[\"amazonMusic\",\"amazonStore\"]},\"AUDIUS_SONG::P76oJ\":{\"id\":\"P76oJ\",\"type\":\"song\",\"title\":\"Queen
@@ -240,7 +175,7 @@ interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Sun, 30 Jul 2023 10:05:26 GMT
+      - Sun, 30 Jul 2023 11:07:10 GMT
       Strict-Transport-Security:
       - max-age=300
       Vary:
@@ -252,13 +187,13 @@ interactions:
       X-Cache-Hits:
       - 0, 0
       X-Served-By:
-      - cache-sjc1000133-SJC, cache-fra-etou8220026-FRA
+      - cache-sjc1000133-SJC, cache-fra-eddf8230071-FRA
       X-Timer:
-      - S1690711523.334090,VS0,VE3110
+      - S1690715230.975678,VS0,VE229
       cache-control:
       - no-store, max-age=0
       x-content-matching-id:
-      - 13415d48-55c5-4001-9fd9-0365e3f3c1f0
+      - 9eb5bcd0-283e-4032-9543-137b2c17b0cf
     http_version: HTTP/1.1
     status_code: 200
 version: 1
