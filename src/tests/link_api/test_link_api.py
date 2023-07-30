@@ -2,7 +2,6 @@ import os
 from unittest.mock import MagicMock
 
 import pytest
-import vcr
 
 from songlinker.link_api import LinkApi
 
