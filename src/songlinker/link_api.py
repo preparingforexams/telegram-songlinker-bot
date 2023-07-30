@@ -1,4 +1,7 @@
-from typing import Annotated, Self
+from collections import namedtuple
+from dataclasses import dataclass
+from enum import Enum
+from typing import Annotated, Iterable, Self
 
 import httpx
 from pydantic import AnyUrl, BaseModel, ConfigDict, Field, HttpUrl
@@ -18,6 +21,17 @@ UniqueEntityId = Annotated[
 ]
 
 NonEmptyString = Annotated[str, Field(min_length=1)]
+
+PlatformSpec = namedtuple("PlatformSpec", ["id", "name"])
+
+
+class Platform(Enum):
+    spotify = PlatformSpec("spotify", "Spotify")
+    apple_music = PlatformSpec("appleMusic", "Apple Music")
+    deezer = PlatformSpec("deezer", "Deezer")
+    soundcloud = PlatformSpec("soundcloud", "SoundCloud")
+    tidal = PlatformSpec("tidal", "Tidal")
+    youtube = PlatformSpec("youtube", "YouTube")
 
 
 class PlatformMetadata(CamelCaseModel):
@@ -47,22 +61,29 @@ class ErrorResponse(CamelCaseModel):
     code: NonEmptyString
 
 
-class SongLinks(BaseModel):
-    page: HttpUrl
-    apple_music: HttpUrl | None
-    deezer: HttpUrl | None
-    spotify: HttpUrl | None
-    soundcloud: HttpUrl | None
-    tidal: HttpUrl | None
-    youtube: HttpUrl | None
+class SongLinks:
+    def __init__(self, page: str, link_by_platform: dict[Platform, str]):
+        self.page = page
+        self._link_by_platform = link_by_platform
+
+    def __getitem__(self, item: Platform) -> str | None:
+        return self._link_by_platform.get(item)
+
+    def items(self) -> Iterable[tuple[Platform, str]]:
+        return sorted(
+            self._link_by_platform.items(),
+            key=lambda t: t[0].value.name,
+        )
 
 
-class SongMetadata(BaseModel):
-    title: NonEmptyString
-    artist_name: NonEmptyString | None
+@dataclass
+class SongMetadata:
+    title: str
+    artist_name: str | None
 
 
-class SongData(BaseModel):
+@dataclass
+class SongData:
     links: SongLinks
     metadata: SongMetadata
 
@@ -114,9 +135,9 @@ class LinkApi:
     def _extract_url(
         self,
         links_by_platform: dict[str, PlatformLink],
-        platform: str,
+        platform: Platform,
     ) -> HttpUrl | None:
-        platform_link = links_by_platform.get(platform)
+        platform_link = links_by_platform.get(platform.value.id)
         if platform_link is None:
             return None
         return platform_link.url
@@ -131,20 +152,21 @@ class LinkApi:
             links_by_platform=response.links_by_platform,
             entities_by_unique_id=response.entities_by_unique_id,
         )
+
+        link_by_platform: dict[Platform, str] = {}
+        for platform in Platform:
+            link = self._extract_url(response.links_by_platform, platform)
+            if link is not None:
+                link_by_platform[platform] = str(link)
+
         links = SongLinks(
-            page=response.page_url,
-            apple_music=self._extract_url(response.links_by_platform, "appleMusic"),
-            deezer=self._extract_url(response.links_by_platform, "deezer"),
-            spotify=self._extract_url(response.links_by_platform, "spotify"),
-            soundcloud=self._extract_url(response.links_by_platform, "soundcloud"),
-            tidal=self._extract_url(response.links_by_platform, "tidal"),
-            youtube=self._extract_url(response.links_by_platform, "youtube"),
+            page=str(response.page_url),
+            link_by_platform=link_by_platform,
         )
-        return SongData.model_validate(
-            SongData(
-                metadata=metadata,
-                links=links,
-            )
+
+        return SongData(
+            metadata=metadata,
+            links=links,
         )
 
     def lookup_links(self, url: str) -> SongData | None:

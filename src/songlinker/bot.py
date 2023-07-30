@@ -1,21 +1,21 @@
 import logging
 import os
 import uuid
-from dataclasses import dataclass
-from typing import Iterable, Optional
+from typing import Iterable
 from urllib import parse
 
-from httpx import Client, HTTPError
-
-from . import telegram
+from songlinker import telegram
+from songlinker.link_api import IoException, LinkApi, Platform, SongData
 
 _LOG = logging.getLogger(__name__)
 
-_api_key = os.getenv("SONGLINK_API_TOKEN")
-_api_base_url = "https://api.song.link/v1-alpha.1/links"
+
+_api_key: str = os.getenv("SONGLINK_API_TOKEN")  # type: ignore
 
 
 def handle_updates():
+    if not _api_key:
+        raise ValueError("SONGLINK_API_TOKEN is not set")
     telegram.check()
     telegram.handle_updates(
         lambda: True,
@@ -31,33 +31,38 @@ def _handle_update(update: dict) -> None:
             _handle_query(inline_query)
 
 
-@dataclass
-class SongLink:
-    url: str
-    artist: Optional[str] = None
-    title: Optional[str] = None
+class SongResult:
+    def __init__(self, data: SongData):
+        self.data = data
+
+    @staticmethod
+    def _format_link(platform: Platform, link: str) -> str:
+        return f'<a href="{link}">{platform.value.name}</a>'
 
     def to_message_content(self) -> str:
-        artist = self.artist
-        title = self.title
-        if not artist or not title:
-            return self.url
-        else:
-            return f"{artist} - {title}: {self.url}"
+        title = self.data.metadata.title
+        artist = self.data.metadata.artist_name
+        name = title if artist is None else f"{artist} - {title}"
+        links = ", ".join(
+            self._format_link(platform, link)
+            for platform, link in self.data.links.items()
+        )
+
+        return f"{name}\n[{links}]"
 
     def to_inline_result(self) -> dict:
-        artist = self.artist
-        title = self.title
-        result_title = self.url
+        artist = self.data.metadata.artist_name
+        title = self.data.metadata.title
+        result_title = self.data.links.page
         if artist and title:
             result_title = f"{artist} - {title}"
         return {
             "type": "article",
             "id": _random_id(),
             "title": result_title,
-            "url": self.url,
+            "url": self.data.links.page,
             "input_message_content": {
-                "message_text": self.url,
+                "message_text": self.data.links.page,
             },
         }
 
@@ -68,16 +73,16 @@ def _random_id() -> str:
 
 def _handle_query(query: dict) -> None:
     query_text: str = query["query"].strip()
-    song_link: Optional[SongLink] = None
+    song_result: SongResult | None = None
     if query_text:
         try:
             url = parse.urlparse(query_text)
             if url.scheme == "http" or url.scheme == "https":
-                with Client(timeout=20) as client:
-                    song_link = _build_link(client, query_text)
+                with LinkApi(api_key=_api_key) as api:
+                    song_result = _build_result(api, query_text)
         except ValueError:
             pass
-    results = [song_link.to_inline_result()] if song_link else []
+    results = [song_result.to_inline_result()] if song_result else []
     telegram.answer_inline_query(
         inline_query_id=query["id"],
         results=results,
@@ -91,7 +96,7 @@ def _handle_message(message: dict):
         _LOG.debug("No entities in message")
         return
 
-    urls = []
+    urls = set()
 
     for entity in entities:
         entity_type = entity["type"]
@@ -99,22 +104,22 @@ def _handle_message(message: dict):
             offset = int(entity["offset"])
             length = int(entity["length"])
             url = message["text"][offset : offset + length]
-            urls.append(url)
+            urls.add(url)
         elif entity_type == "text_link":
-            urls.append(entity["url"])
+            urls.add(entity["url"])
 
     _LOG.debug("Got %d URLs", len(urls))
 
-    urls = list(dict.fromkeys(filter(_not_song_link, urls)))
+    urls = {url for url in urls if _not_song_link(url)}
 
     if not urls:
         _LOG.info("No URLs after filtering")
         return
 
-    with Client(timeout=20) as client:
-        links = (_build_link(client, url) for url in urls)
+    with LinkApi(api_key=_api_key) as api:
+        results = (_build_result(api, url) for url in urls)
         message_contents = [
-            link.to_message_content() for link in links if link is not None
+            result.to_message_content() for result in results if result is not None
         ]
 
     if not message_contents:
@@ -127,6 +132,7 @@ def _handle_message(message: dict):
         disable_web_page_preview=True,
         disable_notification=True,
         text=_build_message(message_contents),
+        parse_mode="HTML",
     )
 
 
@@ -134,32 +140,18 @@ def _not_song_link(url: str) -> bool:
     return "song.link" not in url
 
 
-def _build_link(client: Client, url: str) -> Optional[SongLink]:
-    params = {"url": url, "userCountry": "DE", "key": _api_key}
-
+def _build_result(api: LinkApi, url: str) -> SongResult | None:
     try:
-        result = client.get(_api_base_url, params=params)
-        if (
-            result.status_code == 400
-            and result.json()["code"] == "could_not_resolve_entity"
-        ):
-            # In this case the URL just isn't a song
-            return None
-        result.raise_for_status()
-        info = result.json()
-        bare_url = info["pageUrl"]
-        entities_by_id: dict = info["entitiesByUniqueId"]
-        for match in entities_by_id.values():
-            if match["apiProvider"] == "spotify":
-                title = match.get("title")
-                artist = match.get("artistName")
-                return SongLink(bare_url, artist, title)
-
-        return SongLink(bare_url)
-    except HTTPError as e:
-        _LOG.warning("Could not get URL from API", exc_info=e)
+        data = api.lookup_links(url)
+    except IoException as e:
+        _LOG.error(f"Could not look up data for URL {url}", exc_info=e)
         return None
 
+    if data is None:
+        return None
 
-def _build_message(links: Iterable[str]) -> str:
-    return "\n".join(links)
+    return SongResult(data)
+
+
+def _build_message(formatted_links: Iterable[str]) -> str:
+    return "\n\n".join(formatted_links)

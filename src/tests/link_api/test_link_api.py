@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 import httpx
 import pytest
 
-from songlinker.link_api import LinkApi, IoException
+from songlinker.link_api import IoException, LinkApi, Platform
 
 
 @pytest.fixture()
@@ -80,12 +80,8 @@ class TestLinkApi:
         assert data is not None
 
         links = data.links
-        assert links.apple_music
-        assert links.deezer
-        assert links.spotify
-        assert links.soundcloud
-        assert links.tidal
-        assert links.youtube
+        for platform in Platform:
+            assert links[platform]
 
         metadata = data.metadata
         assert metadata.title == title

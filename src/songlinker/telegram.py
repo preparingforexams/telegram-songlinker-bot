@@ -61,18 +61,24 @@ def send_message(
     reply_to_message_id: Optional[int] = None,
     disable_web_page_preview: bool = False,
     disable_notification: bool = False,
+    parse_mode: str | None = None,
 ) -> dict:
+    body = {
+        "chat_id": chat_id,
+        "reply_to_message_id": reply_to_message_id,
+        "disable_notification": disable_notification,
+        "allow_sending_without_reply": True,
+        "disable_web_page_preview": disable_web_page_preview,
+        "text": text,
+    }
+
+    if parse_mode:
+        body["parse_mode"] = parse_mode
+
     return _get_actual_body(
         _client.post(
             _build_url("sendMessage"),
-            json={
-                "chat_id": chat_id,
-                "reply_to_message_id": reply_to_message_id,
-                "disable_notification": disable_notification,
-                "allow_sending_without_reply": True,
-                "disable_web_page_preview": disable_web_page_preview,
-                "text": text,
-            },
+            json=body,
         )
     )
 
