@@ -79,6 +79,8 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
+          build-args: |
+            APP_VERSION=${{ github.sha }}
           tags: "ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ github.sha }}"
 
   deploy:
