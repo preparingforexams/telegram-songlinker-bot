@@ -35,6 +35,7 @@ markers = [
 
 [tool.mypy]
 # TODO: strict = true
+plugins = [ "pydantic.mypy" ]
 check_untyped_defs = true
 
 [[tool.mypy.overrides]]
