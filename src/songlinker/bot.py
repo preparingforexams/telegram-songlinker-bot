@@ -62,7 +62,9 @@ class SongResult:
             "title": result_title,
             "url": self.data.links.page,
             "input_message_content": {
-                "message_text": self.data.links.page,
+                "message_text": self.to_message_content(),
+                "parse_mode": "HTML",
+                "disable_web_page_preview": True,
             },
         }
 
