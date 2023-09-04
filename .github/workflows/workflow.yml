@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Install Poetry
         run: pip install poetry==1.6.1
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: poetry install
       - name: Check coding standards
         run: |
@@ -26,7 +26,7 @@ jobs:
     steps:
       - name: Install Poetry
         run: pip install poetry==1.6.1
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: poetry install
       - name: Run tests
         env:
@@ -39,7 +39,7 @@ jobs:
     steps:
       - name: Install Poetry
         run: pip install poetry==1.6.1
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: poetry install
       - name: Run tests
         run: poetry run pytest -m "not integration" src/
@@ -91,7 +91,7 @@ jobs:
     steps:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Substitute environment variables in values.yaml
         run: "envsubst < values.yaml > values_sub.yaml && mv values_sub.yaml values.yaml"
         env:
