@@ -1,8 +1,8 @@
 import logging
-import os
 
 import click
 import sentry_sdk
+from bs_config import Env
 
 from . import bot
 
@@ -14,19 +14,15 @@ def _setup_logging() -> None:
     _LOG.level = logging.DEBUG
 
 
-def _setup_sentry() -> None:
-    dsn = os.getenv("SENTRY_DSN")
-    if not dsn:
+def _setup_sentry(env: Env) -> None:
+    dsn = env.get_string("SENTRY_DSN")
+    if dsn is None:
         _LOG.warning("No Sentry DSN found")
         return
 
     sentry_sdk.init(
         dsn,
-        release=os.getenv("BUILD_SHA") or "dirty",
-        # Set traces_sample_rate to 1.0 to capture 100%
-        # of transactions for performance monitoring.
-        # We recommend adjusting this value in production.
-        traces_sample_rate=1.0,
+        release=env.get_string("APP_VERSION", default="dirty"),
     )
 
 
@@ -40,8 +36,13 @@ def handle_updates() -> None:
     bot.handle_updates()
 
 
-if __name__ == "__main__":
+def _main() -> None:
+    env = Env.load()
     _setup_logging()
-    _setup_sentry()
+    _setup_sentry(env)
 
     app.main()
+
+
+if __name__ == "__main__":
+    _main()
