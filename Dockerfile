@@ -1,24 +1,36 @@
-FROM python:3.11-slim
+FROM python:3.11-slim-bullseye
 
-RUN useradd --system --create-home --home-dir /app -s /bin/bash app
+RUN groupadd --system --gid 500 app
+RUN useradd --system --uid 500 --gid app --create-home --home-dir /app -s /bin/bash app
+
+RUN apt-get update -qq \
+    && apt-get install -y --no-install-recommends \
+      curl \
+      tini \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+# renovate: datasource=pypi depName=poetry
+ENV POETRY_VERSION=1.6.1
+ENV POETRY_HOME="/opt/poetry"
+ENV POETRY_VIRTUALENVS_IN_PROJECT=false
+ENV PATH="$POETRY_HOME/bin:$PATH"
+
+RUN curl -sSL https://install.python-poetry.org | python3 -
+
 USER app
-ENV PATH=$PATH:/app/.local/bin
-
 WORKDIR /app
 
-ENV POETRY_VIRTUALENVS_CREATE=false
-
-RUN pip install pipx==1.2.0 --user --no-cache
-RUN pipx install poetry==1.6.1
-
 COPY [ "poetry.toml", "poetry.lock", "pyproject.toml", "./" ]
+
+RUN poetry install --no-interaction --ansi --only=main --no-root
 
 # We don't want the tests
 COPY src/songlinker ./src/songlinker
 
-RUN poetry install --only main
+RUN poetry install --no-interaction --ansi --only-root
 
 ARG APP_VERSION
-ENV BUILD_SHA=$APP_VERSION
+ENV APP_VERSION=$APP_VERSION
 
-ENTRYPOINT [ "poetry", "run", "python", "-m", "songlinker"  ]
+ENTRYPOINT [ "tini", "--", "poetry", "run", "python", "-m", "songlinker" ]

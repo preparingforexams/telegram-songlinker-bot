@@ -7,7 +7,7 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    container: python:3.11-slim
+    container: python:3.11-slim-bullseye
     steps:
       - name: Install Poetry
         run: pip install poetry==1.6.1
@@ -15,14 +15,14 @@ jobs:
       - run: poetry install
       - name: Check coding standards
         run: |
+          poetry run ruff check src/
           poetry run black --check src/
-          poetry run isort --check-only src/
           poetry run mypy src/
 
   integration-test:
     runs-on: ubuntu-latest
     if: github.ref_name == github.event.repository.default_branch
-    container: python:3.11-slim
+    container: python:3.11-slim-bullseye
     steps:
       - name: Install Poetry
         run: pip install poetry==1.6.1
@@ -35,7 +35,7 @@ jobs:
 
   unit-test:
     runs-on: ubuntu-latest
-    container: python:3.11-slim
+    container: python:3.11-slim-bullseye
     steps:
       - name: Install Poetry
         run: pip install poetry==1.6.1

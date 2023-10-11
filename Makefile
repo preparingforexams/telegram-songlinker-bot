@@ -4,7 +4,7 @@ check: lint test
 .PHONY: lint
 lint:
 	poetry run black src/
-	poetry run isort src/
+	poetry run ruff check --fix --show-fixes src/
 	poetry run mypy src/
 
 .PHONY: test

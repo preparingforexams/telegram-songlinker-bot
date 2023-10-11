@@ -9,12 +9,12 @@ from . import bot
 _LOG = logging.getLogger("songlinker")
 
 
-def _setup_logging():
+def _setup_logging() -> None:
     logging.basicConfig()
     _LOG.level = logging.DEBUG
 
 
-def _setup_sentry():
+def _setup_sentry() -> None:
     dsn = os.getenv("SENTRY_DSN")
     if not dsn:
         _LOG.warning("No Sentry DSN found")
@@ -31,12 +31,12 @@ def _setup_sentry():
 
 
 @click.group()
-def app():
+def app() -> None:
     pass
 
 
 @app.command()
-def handle_updates():
+def handle_updates() -> None:
     bot.handle_updates()
 
 

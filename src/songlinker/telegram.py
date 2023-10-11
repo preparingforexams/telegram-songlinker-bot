@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Callable, List, Optional
+from typing import Any, Callable, Optional, cast
 
 import httpx
 
@@ -9,7 +9,7 @@ _LOG = logging.getLogger(__name__)
 _client = httpx.Client(timeout=30)
 
 
-def check():
+def check() -> None:
     if not _API_KEY:
         raise ValueError("Missing TELEGRAM_API_KEY")
 
@@ -18,31 +18,37 @@ def _build_url(method: str) -> str:
     return f"https://api.telegram.org/bot{_API_KEY}/{method}"
 
 
-def _get_actual_body(response: httpx.Response):
+def _get_actual_body(response: httpx.Response) -> dict[str, Any] | list[Any]:
     response.raise_for_status()
     body = response.json()
     if body.get("ok"):
-        return body["result"]
+        return cast(dict[str, Any] | list[Any], body["result"])
     raise ValueError(f"Body was not ok! {body}")
 
 
-def _request_updates(last_update_id: Optional[int]) -> List[dict]:
-    body: Optional[dict] = None
+def _request_updates(last_update_id: Optional[int]) -> list[dict[str, Any]]:
+    body: dict[str, Any] | None = None
     if last_update_id:
         body = {
             "offset": last_update_id + 1,
             "timeout": 10,
         }
-    return _get_actual_body(
-        _client.post(
-            _build_url("getUpdates"),
-            json=body,
-            timeout=12,
-        )
+    return cast(
+        list[dict[str, Any]],
+        _get_actual_body(
+            _client.post(
+                _build_url("getUpdates"),
+                json=body,
+                timeout=12,
+            )
+        ),
     )
 
 
-def handle_updates(should_run: Callable[[], bool], handler: Callable[[dict], None]):
+def handle_updates(
+    should_run: Callable[[], bool],
+    handler: Callable[[dict[str, Any]], None],
+) -> None:
     last_update_id: Optional[int] = None
     while should_run():
         updates = _request_updates(last_update_id)
@@ -62,7 +68,7 @@ def send_message(
     disable_web_page_preview: bool = False,
     disable_notification: bool = False,
     parse_mode: str | None = None,
-) -> dict:
+) -> dict[str, Any]:
     body = {
         "chat_id": chat_id,
         "reply_to_message_id": reply_to_message_id,
@@ -75,16 +81,19 @@ def send_message(
     if parse_mode:
         body["parse_mode"] = parse_mode
 
-    return _get_actual_body(
-        _client.post(
-            _build_url("sendMessage"),
-            json=body,
-        )
+    return cast(
+        dict[str, Any],
+        _get_actual_body(
+            _client.post(
+                _build_url("sendMessage"),
+                json=body,
+            )
+        ),
     )
 
 
-def answer_inline_query(inline_query_id: str | int, results: list):
-    return _get_actual_body(
+def answer_inline_query(inline_query_id: str | int, results: list[Any]) -> None:
+    _get_actual_body(
         _client.post(
             _build_url("answerInlineQuery"),
             json={

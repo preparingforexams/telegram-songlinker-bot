@@ -1,7 +1,7 @@
 import logging
 import os
 import uuid
-from typing import Iterable
+from typing import Any, Iterable
 from urllib import parse
 
 from songlinker import telegram
@@ -13,7 +13,7 @@ _LOG = logging.getLogger(__name__)
 _api_key: str = os.getenv("SONGLINK_API_TOKEN")  # type: ignore
 
 
-def handle_updates():
+def handle_updates() -> None:
     if not _api_key:
         raise ValueError("SONGLINK_API_TOKEN is not set")
     telegram.check()
@@ -23,7 +23,7 @@ def handle_updates():
     )
 
 
-def _handle_update(update: dict) -> None:
+def _handle_update(update: dict[str, Any]) -> None:
     match update:
         case {"message": message} if message:
             _handle_message(message)
@@ -50,7 +50,7 @@ class SongResult:
 
         return f"{name}\n[{links}]"
 
-    def to_inline_result(self) -> dict:
+    def to_inline_result(self) -> dict[str, Any]:
         artist = self.data.metadata.artist_name
         title = self.data.metadata.title
         result_title = self.data.links.page
@@ -73,7 +73,7 @@ def _random_id() -> str:
     return str(uuid.uuid4())
 
 
-def _handle_query(query: dict) -> None:
+def _handle_query(query: dict[str, Any]) -> None:
     query_text: str = query["query"].strip()
     song_result: SongResult | None = None
     if query_text:
@@ -91,7 +91,7 @@ def _handle_query(query: dict) -> None:
     )
 
 
-def _handle_message(message: dict):
+def _handle_message(message: dict[str, Any]) -> None:
     chat = message["chat"]
     entities = message.get("entities")
     if not entities:

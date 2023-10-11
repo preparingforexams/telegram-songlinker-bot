@@ -102,10 +102,15 @@ class LinkApi:
     def __enter__(self) -> Self:
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(  # type: ignore[no-untyped-def]
+        self,
+        exc_type,
+        exc_val,
+        exc_tb,
+    ) -> None:
         self.close()
 
-    def close(self):
+    def close(self) -> None:
         self._client.close()
 
     def _extract_metadata(
