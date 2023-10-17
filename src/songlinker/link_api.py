@@ -150,9 +150,6 @@ class LinkApi:
     def _parse_response(self, content: bytes) -> SongData | None:
         response = LinkResponse.model_validate_json(content)
 
-        if len(response.entities_by_unique_id) == 1:
-            return None
-
         metadata = self._extract_metadata(
             links_by_platform=response.links_by_platform,
             entities_by_unique_id=response.entities_by_unique_id,
@@ -163,6 +160,9 @@ class LinkApi:
             link = self._extract_url(response.links_by_platform, platform)
             if link is not None:
                 link_by_platform[platform] = str(link)
+
+        if len(link_by_platform) <= 1:
+            return None
 
         links = SongLinks(
             page=str(response.page_url),
