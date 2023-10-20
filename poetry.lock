@@ -77,13 +77,13 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "bs-config"
-version = "0.3.0"
+version = "1.0.0"
 description = "Config"
 optional = false
 python-versions = ">=3.11,<3.13"
 files = [
-    {file = "bs_config-0.3.0-py3-none-any.whl", hash = "sha256:6162063926a775068917574cdee906b526733e7066b5a99eda687f926d8aa542"},
-    {file = "bs_config-0.3.0.tar.gz", hash = "sha256:464dcaf5552fd028a7d22d470672567e2369007f33c13ea7456210bbf595399d"},
+    {file = "bs_config-1.0.0-py3-none-any.whl", hash = "sha256:1c42d83cbd6768fa080d8322d35dbf398744b08fe63f529921780848e3761e57"},
+    {file = "bs_config-1.0.0.tar.gz", hash = "sha256:ab1f9a77596ca3639c1206dd68be83881773cb6ba6dbc6d20defabc66dbf440c"},
 ]
 
 [package.extras]
@@ -950,4 +950,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.11"
-content-hash = "bed7c3f9bbd784c0757c2cbbf7ea6d9adadccd64f9ff7d0a0376c29f416a699d"
+content-hash = "a19d389019940518df26313bfef7145774cbaf2a9daa4d0e098bdb6c91390054"
