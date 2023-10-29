@@ -11,7 +11,6 @@ from songlinker.link_api import IoException, LinkApi, Platform, SongData
 
 _LOG = logging.getLogger(__name__)
 
-
 _api_key: str = os.getenv("SONGLINK_API_TOKEN")  # type: ignore
 
 
@@ -88,7 +87,13 @@ def _handle_query(query: dict[str, Any]) -> None:
             url = parse.urlparse(query_text)
             if url.scheme == "http" or url.scheme == "https":
                 with LinkApi(api_key=_api_key) as api:
-                    song_result = _build_result(api, EntityMatch(url=query_text))
+                    song_result = _build_result(
+                        api,
+                        EntityMatch(
+                            position=EntityPosition(offset=0, length=len(query_text)),
+                            url=query_text,
+                        ),
+                    )
         except ValueError:
             pass
     results = [song_result.to_inline_result()] if song_result else []
@@ -98,8 +103,12 @@ def _handle_query(query: dict[str, Any]) -> None:
     )
 
 
+EntityPosition = namedtuple("EntityPosition", ["offset", "length"])
+
+
 @dataclass(frozen=True)
 class EntityMatch:
+    position: EntityPosition
     url: str | None = None
     is_spoiler: bool = False
 
@@ -111,6 +120,9 @@ class EntityMatch:
         return url
 
     def merge(self, other: Self) -> Self:
+        if other.position != self.position:
+            raise ValueError("Can't merge entities with different positions")
+
         if other.url is not None and self.url is not None:
             raise ValueError("Can't overwrite url")
 
@@ -120,18 +132,71 @@ class EntityMatch:
         return cast(
             Self,
             EntityMatch(
+                position=self.position,
                 url=other.url or self.url,
                 is_spoiler=other.is_spoiler or self.is_spoiler,
             ),
         )
 
+    def with_spoiler(self) -> Self:
+        if self.is_spoiler:
+            return self
 
-EntityPosition = namedtuple("EntityPosition", ["offset", "length"])
+        return cast(
+            Self,
+            EntityMatch(
+                position=self.position,
+                url=self.url,
+                is_spoiler=True,
+            ),
+        )
+
+    def contains(self, position: EntityPosition) -> bool:
+        own = self.position
+        if position.offset < own.offset:
+            # Their start is before our start
+            return False
+
+        if (position.offset + position.length) > (own.offset + own.length):
+            # Their end is after our end
+            return False
+
+        return True
 
 
 def _get_text(message: dict[str, Any], position: EntityPosition) -> str:
     text: str = cast(str, message["text"])
     return text[position.offset : position.offset + position.length]
+
+
+def _spoil_if_match(
+    match: EntityMatch,
+    spoiler_matches: list[EntityMatch],
+) -> EntityMatch:
+    if match.is_spoiler:
+        return match
+
+    if any(spoiler.contains(match.position) for spoiler in spoiler_matches):
+        return match.with_spoiler()
+
+    return match
+
+
+def _collapse_entities(
+    entity_by_position: dict[EntityPosition, EntityMatch],
+) -> list[EntityMatch]:
+    spoiler_matches = [
+        match for match in entity_by_position.values() if match.url is None
+    ]
+
+    return [
+        _spoil_if_match(match, spoiler_matches)
+        for match in sorted(
+            entity_by_position.values(),
+            key=lambda match: match.position.offset,
+        )
+        if match.url is not None and _not_song_link(match.require_url())
+    ]
 
 
 def _handle_message(message: dict[str, Any]) -> None:
@@ -153,11 +218,11 @@ def _handle_message(message: dict[str, Any]) -> None:
         match entity["type"]:
             case "url":
                 url = _get_text(message, position)
-                entity_match = EntityMatch(url=url)
+                entity_match = EntityMatch(position=position, url=url)
             case "text_link":
-                entity_match = EntityMatch(url=entity["url"])
+                entity_match = EntityMatch(position=position, url=entity["url"])
             case "spoiler":
-                entity_match = EntityMatch(is_spoiler=True)
+                entity_match = EntityMatch(position=position, is_spoiler=True)
             case _:
                 continue
 
@@ -169,14 +234,7 @@ def _handle_message(message: dict[str, Any]) -> None:
 
     _LOG.debug("Got %d entity matches", len(entity_by_position))
 
-    entity_matches = [
-        match
-        for _, match in sorted(
-            entity_by_position.items(),
-            key=lambda t: t[0].offset,
-        )
-        if match.url is not None and _not_song_link(match.require_url())
-    ]
+    entity_matches = _collapse_entities(entity_by_position)
 
     if not entity_matches:
         _LOG.info("No URLs after filtering")
