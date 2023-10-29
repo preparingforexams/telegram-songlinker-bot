@@ -1,7 +1,9 @@
 import logging
 import os
 import uuid
-from typing import Any, Iterable
+from collections import namedtuple
+from dataclasses import dataclass
+from typing import Any, Iterable, Self, cast
 from urllib import parse
 
 from songlinker import telegram
@@ -32,8 +34,9 @@ def _handle_update(update: dict[str, Any]) -> None:
 
 
 class SongResult:
-    def __init__(self, data: SongData):
+    def __init__(self, data: SongData, *, is_spoiler: bool):
         self.data = data
+        self.is_spoiler = is_spoiler
 
     @staticmethod
     def _format_link(platform: Platform, link: str) -> str:
@@ -48,7 +51,11 @@ class SongResult:
             for platform, link in self.data.links.items()
         )
 
-        return f"{name}\n[{links}]"
+        result = f"{name}\n[{links}]"
+        if self.is_spoiler:
+            return f"<tg-spoiler>{result}</tg-spoiler>"
+        else:
+            return result
 
     def to_inline_result(self) -> dict[str, Any]:
         artist = self.data.metadata.artist_name
@@ -81,7 +88,7 @@ def _handle_query(query: dict[str, Any]) -> None:
             url = parse.urlparse(query_text)
             if url.scheme == "http" or url.scheme == "https":
                 with LinkApi(api_key=_api_key) as api:
-                    song_result = _build_result(api, query_text)
+                    song_result = _build_result(api, EntityMatch(url=query_text))
         except ValueError:
             pass
     results = [song_result.to_inline_result()] if song_result else []
@@ -91,6 +98,42 @@ def _handle_query(query: dict[str, Any]) -> None:
     )
 
 
+@dataclass(frozen=True)
+class EntityMatch:
+    url: str | None = None
+    is_spoiler: bool = False
+
+    def require_url(self) -> str:
+        url = self.url
+        if not url:
+            raise ValueError("url is None")
+
+        return url
+
+    def merge(self, other: Self) -> Self:
+        if other.url is not None and self.url is not None:
+            raise ValueError("Can't overwrite url")
+
+        if other.is_spoiler and self.is_spoiler:
+            raise ValueError("Can't overwrite is_spoiler")
+
+        return cast(
+            Self,
+            EntityMatch(
+                url=other.url or self.url,
+                is_spoiler=other.is_spoiler or self.is_spoiler,
+            ),
+        )
+
+
+EntityPosition = namedtuple("EntityPosition", ["offset", "length"])
+
+
+def _get_text(message: dict[str, Any], position: EntityPosition) -> str:
+    text: str = cast(str, message["text"])
+    return text[position.offset : position.offset + position.length]
+
+
 def _handle_message(message: dict[str, Any]) -> None:
     chat = message["chat"]
     entities = message.get("entities")
@@ -98,28 +141,49 @@ def _handle_message(message: dict[str, Any]) -> None:
         _LOG.debug("No entities in message")
         return
 
-    urls = set()
+    entity_by_position: dict[EntityPosition, EntityMatch] = {}
 
     for entity in entities:
-        entity_type = entity["type"]
-        if entity_type == "url":
-            offset = int(entity["offset"])
-            length = int(entity["length"])
-            url = message["text"][offset : offset + length]
-            urls.add(url)
-        elif entity_type == "text_link":
-            urls.add(entity["url"])
+        position = EntityPosition(
+            offset=entity["offset"],
+            length=entity["length"],
+        )
 
-    _LOG.debug("Got %d URLs", len(urls))
+        entity_match: EntityMatch
+        match entity["type"]:
+            case "url":
+                url = _get_text(message, position)
+                entity_match = EntityMatch(url=url)
+            case "text_link":
+                entity_match = EntityMatch(url=entity["url"])
+            case "spoiler":
+                entity_match = EntityMatch(is_spoiler=True)
+            case _:
+                continue
 
-    urls = {url for url in urls if _not_song_link(url)}
+        existing_match = entity_by_position.get(position)
+        if existing_match is None:
+            entity_by_position[position] = entity_match
+        else:
+            entity_by_position[position] = existing_match.merge(entity_match)
 
-    if not urls:
+    _LOG.debug("Got %d entity matches", len(entity_by_position))
+
+    entity_matches = [
+        match
+        for _, match in sorted(
+            entity_by_position.items(),
+            key=lambda t: t[0].offset,
+        )
+        if match.url is not None and _not_song_link(match.require_url())
+    ]
+
+    if not entity_matches:
         _LOG.info("No URLs after filtering")
         return
 
     with LinkApi(api_key=_api_key) as api:
-        results = (_build_result(api, url) for url in urls)
+        results = (_build_result(api, match) for match in entity_matches)
         message_contents = [
             result.to_message_content() for result in results if result is not None
         ]
@@ -142,17 +206,20 @@ def _not_song_link(url: str) -> bool:
     return "song.link" not in url
 
 
-def _build_result(api: LinkApi, url: str) -> SongResult | None:
+def _build_result(api: LinkApi, entity: EntityMatch) -> SongResult | None:
     try:
-        data = api.lookup_links(url)
+        data = api.lookup_links(entity.require_url())
     except IoException as e:
-        _LOG.error(f"Could not look up data for URL {url}", exc_info=e)
+        _LOG.error(
+            f"Could not look up data for URL {entity.require_url()}",
+            exc_info=e,
+        )
         return None
 
     if data is None:
         return None
 
-    return SongResult(data)
+    return SongResult(data, is_spoiler=entity.is_spoiler)
 
 
 def _build_message(formatted_links: Iterable[str]) -> str:
