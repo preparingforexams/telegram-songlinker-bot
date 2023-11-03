@@ -11,7 +11,7 @@ RUN apt-get update -qq \
     && rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # renovate: datasource=pypi depName=poetry
-ENV POETRY_VERSION=1.6.1
+ENV POETRY_VERSION=1.7.0
 ENV POETRY_HOME="/opt/poetry"
 ENV POETRY_VIRTUALENVS_IN_PROJECT=false
 ENV PATH="$POETRY_HOME/bin:$PATH"
