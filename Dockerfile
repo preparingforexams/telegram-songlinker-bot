@@ -1,4 +1,4 @@
-FROM ghcr.io/blindfoldedsurgery/poetry:1.0.3-pipx-3.11-bookworm
+FROM ghcr.io/blindfoldedsurgery/poetry:1.1.1-pipx-3.11-bookworm
 
 COPY [ "poetry.toml", "poetry.lock", "pyproject.toml", "./" ]
 
