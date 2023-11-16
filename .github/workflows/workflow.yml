@@ -10,7 +10,7 @@ jobs:
     container: python:3.11-slim-bullseye
     steps:
       - name: Install Poetry
-        run: pip install poetry==1.7.0
+        run: pip install poetry==1.7.1
       - uses: actions/checkout@v4
       - run: poetry install
       - name: Check coding standards
@@ -25,7 +25,7 @@ jobs:
     container: python:3.11-slim-bullseye
     steps:
       - name: Install Poetry
-        run: pip install poetry==1.7.0
+        run: pip install poetry==1.7.1
       - uses: actions/checkout@v4
       - run: poetry install
       - name: Run tests
@@ -38,7 +38,7 @@ jobs:
     container: python:3.11-slim-bullseye
     steps:
       - name: Install Poetry
-        run: pip install poetry==1.7.0
+        run: pip install poetry==1.7.1
       - uses: actions/checkout@v4
       - run: poetry install
       - name: Run tests
