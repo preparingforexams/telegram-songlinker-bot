@@ -24,7 +24,7 @@ mypy = "~1.7"
 pytest = "^7.4.0"
 pytest-mock = "^3.11.1"
 pytest-recording = "^0.13.0"
-ruff = "0.1.6"
+ruff = "0.1.7"
 vcrpy = "^5.0.0"
 
 [build-system]
