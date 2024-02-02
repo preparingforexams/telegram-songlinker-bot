@@ -7,7 +7,7 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    container: python:3.11-slim-bullseye
+    container: python:3.12-slim-bullseye
     steps:
       - name: Install Poetry
         run: pip install poetry==1.7.1
@@ -22,7 +22,7 @@ jobs:
   integration-test:
     runs-on: ubuntu-latest
     if: github.ref_name == github.event.repository.default_branch
-    container: python:3.11-slim-bullseye
+    container: python:3.12-slim-bullseye
     steps:
       - name: Install Poetry
         run: pip install poetry==1.7.1
@@ -35,7 +35,7 @@ jobs:
 
   unit-test:
     runs-on: ubuntu-latest
-    container: python:3.11-slim-bullseye
+    container: python:3.12-slim-bullseye
     steps:
       - name: Install Poetry
         run: pip install poetry==1.7.1
