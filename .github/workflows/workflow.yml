@@ -113,7 +113,7 @@ jobs:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4
       - name: Clean up old app container images
-        uses: actions/delete-package-versions@v4
+        uses: actions/delete-package-versions@v5
         with:
           package-name: ${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}
           package-type: container
