@@ -25,6 +25,11 @@ spec:
           image: {{ .Values.image }}
           args:
             - handle-updates
+          env:
+            - name: ENABLE_TELEMETRY
+              value: "true"
+            - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+              value: https://api.honeycomb.io
           envFrom:
             - secretRef:
                 name: base
