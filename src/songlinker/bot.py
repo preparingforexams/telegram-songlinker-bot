@@ -46,6 +46,10 @@ class SongResult:
         return f'<a href="{link}">{platform.value.name}</a>'
 
     def to_message_content(self) -> str:
+        prefix: str = ""
+        if self.data.metadata.is_album:
+            prefix = "<b>Album:</b> "
+
         title = self.data.metadata.title
         artist = self.data.metadata.artist_name
         name = title if artist is None else f"{artist} - {title}"
@@ -54,7 +58,7 @@ class SongResult:
             for platform, link in self.data.links.items()
         )
 
-        result = f"{name}\n[{links}]"
+        result = f"{prefix}{name}\n[{links}]"
         if self.is_spoiler:
             return f"<tg-spoiler>{result}</tg-spoiler>"
         else:

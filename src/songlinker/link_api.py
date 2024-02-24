@@ -78,8 +78,17 @@ class SongLinks:
 
 @dataclass
 class SongMetadata:
+    type: str
     title: str
     artist_name: str | None
+
+    @property
+    def is_album(self) -> bool:
+        return self.type == "album"
+
+    @property
+    def is_song(self) -> bool:
+        return self.type == "song"
 
 
 @dataclass
@@ -133,6 +142,7 @@ class LinkApi:
             _, entity = entities_by_unique_id.popitem()
 
         return SongMetadata(
+            type=entity.type,
             title=entity.title,
             artist_name=entity.artist_name,
         )
