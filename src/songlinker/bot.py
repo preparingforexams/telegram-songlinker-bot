@@ -1,23 +1,27 @@
 import logging
-import os
 import uuid
 from collections import namedtuple
 from dataclasses import dataclass
 from typing import Any, Iterable, Self, cast
 from urllib import parse
 
+from bs_config import Env
+
 from songlinker import telegram
 from songlinker.link_api import IoException, LinkApi, Platform, SongData
 
 _LOG = logging.getLogger(__name__)
 
-_api_key: str = os.getenv("SONGLINK_API_TOKEN")  # type: ignore
+_api_key = ""
 
 
-def handle_updates() -> None:
-    if not _api_key:
-        raise ValueError("SONGLINK_API_TOKEN is not set")
-    telegram.check()
+def handle_updates(env: Env) -> None:
+    global _api_key
+    if _api_key:
+        raise RuntimeError("Already running")
+    _api_key = env.get_string("SONGLINK_API_TOKEN", required=True)
+
+    telegram.init(env)
     telegram.handle_updates(
         lambda: True,
         _handle_update,

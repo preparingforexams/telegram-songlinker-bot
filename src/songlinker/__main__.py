@@ -32,16 +32,17 @@ def app() -> None:
 
 
 @app.command()
-def handle_updates() -> None:
-    bot.handle_updates()
+@click.pass_obj
+def handle_updates(obj: Env) -> None:
+    bot.handle_updates(obj)
 
 
 def _main() -> None:
-    env = Env.load()
+    env = Env.load(include_default_dotenv=True)
     _setup_logging()
     _setup_sentry(env)
 
-    app.main()
+    app.main(obj=env)
 
 
 if __name__ == "__main__":

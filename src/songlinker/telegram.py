@@ -1,17 +1,21 @@
 import logging
-import os
 from typing import Any, Callable, Optional, cast
 
 import httpx
+from bs_config import Env
 
-_API_KEY = os.getenv("TELEGRAM_API_KEY")
+_API_KEY = ""
 _LOG = logging.getLogger(__name__)
 _client = httpx.Client(timeout=30)
 
 
-def check() -> None:
-    if not _API_KEY:
-        raise ValueError("Missing TELEGRAM_API_KEY")
+def init(env: Env) -> None:
+    global _API_KEY
+
+    if _API_KEY:
+        raise RuntimeError("Tried to initialize telegram library multiple times")
+
+    _API_KEY = env.get_string("TELEGRAM_API_KEY", required=True)
 
 
 def _build_url(method: str) -> str:
