@@ -2,14 +2,20 @@ import logging
 import uuid
 from collections import namedtuple
 from dataclasses import dataclass
+from datetime import datetime
+from datetime import timezone as dt_timezone
 from typing import Any, Iterable, Self, cast
 from urllib import parse
+
+from opentelemetry import trace
+from opentelemetry.trace import Span
 
 from songlinker import telegram
 from songlinker.config import Config
 from songlinker.link_api import IoException, LinkApi, Platform, SongData
 
 _LOG = logging.getLogger(__name__)
+tracer = trace.get_tracer(__name__)
 
 _api_key = ""
 
@@ -28,11 +34,40 @@ def handle_updates(config: Config) -> None:
 
 
 def _handle_update(update: dict[str, Any]) -> None:
-    match update:
-        case {"message": message} if message:
-            _handle_message(message)
-        case {"inline_query": inline_query} if inline_query:
-            _handle_query(inline_query)
+    with tracer.start_as_current_span("handle_update") as span:
+        span.set_attribute("telegram.update_keys", list(update.keys()))
+        span.set_attribute("telegram.update_id", update["update_id"])
+
+        match update:
+            case {"message": message} if message:
+                _collect_message_span_attributes(span, message)
+                _handle_message(message)
+            case {"inline_query": inline_query} if inline_query:
+                _collect_inline_query_span_attributes(span, inline_query)
+                _handle_query(inline_query)
+
+
+def _collect_message_span_attributes(span: Span, message: dict[str, Any]) -> None:
+    chat_id = message["chat"]["id"]
+    span.set_attribute("telegram.chat_id", chat_id)
+    user_id = message["from"]["id"]
+    span.set_attribute("telegram.user_id", user_id)
+    time = datetime.fromtimestamp(
+        message["date"],
+        tz=dt_timezone.utc,
+    )
+    span.set_attribute("telegram.message_timestamp", time.isoformat())
+    message_id = message["message_id"]
+    span.set_attribute("telegram.message_id", message_id)
+
+
+def _collect_inline_query_span_attributes(span: Span, query: dict[str, Any]) -> None:
+    query_id = query["id"]
+    span.set_attribute("telegram.query_id", query_id)
+    chat_type = query["chat_type"]
+    span.set_attribute("telegram.chat_type", chat_type)
+    user_id = query["from"]["id"]
+    span.set_attribute("telegram.user_id", user_id)
 
 
 class SongResult:

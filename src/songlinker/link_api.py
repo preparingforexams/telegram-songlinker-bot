@@ -4,6 +4,7 @@ from enum import Enum
 from typing import Annotated, Iterable, Self
 
 import httpx
+from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 from pydantic import AnyUrl, BaseModel, ConfigDict, Field, HttpUrl
 from pydantic.alias_generators import to_camel
 
@@ -107,6 +108,7 @@ class LinkApi:
     def __init__(self, api_key: str):
         self._api_key = api_key
         self._client = httpx.Client(timeout=20)
+        HTTPXClientInstrumentor().instrument_client(self._client)
 
     def __enter__(self) -> Self:
         return self

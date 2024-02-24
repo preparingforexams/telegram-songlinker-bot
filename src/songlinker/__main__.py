@@ -5,6 +5,7 @@ import sentry_sdk
 from bs_config import Env
 
 from songlinker.config import Config
+from songlinker.tracing import setup_tracing
 
 from . import bot
 
@@ -44,6 +45,7 @@ def _main() -> None:
     config = Config.from_env(env)
     _setup_logging()
     _setup_sentry(config)
+    setup_tracing(config)
 
     app.main(obj=config)
 

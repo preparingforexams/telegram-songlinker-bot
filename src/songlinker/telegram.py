@@ -2,12 +2,14 @@ import logging
 from typing import Any, Callable, Optional, cast
 
 import httpx
+from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 
 from songlinker.config import Config
 
 _API_KEY = ""
 _LOG = logging.getLogger(__name__)
 _client = httpx.Client(timeout=30)
+HTTPXClientInstrumentor().instrument_client(_client)
 
 
 def init(config: Config) -> None:
@@ -31,7 +33,9 @@ def _get_actual_body(response: httpx.Response) -> dict[str, Any] | list[Any]:
     raise ValueError(f"Body was not ok! {body}")
 
 
-def _request_updates(last_update_id: Optional[int]) -> list[dict[str, Any]]:
+def _request_updates(
+    client: httpx.Client, last_update_id: Optional[int]
+) -> list[dict[str, Any]]:
     body: dict[str, Any] | None = None
     if last_update_id:
         body = {
@@ -41,7 +45,7 @@ def _request_updates(last_update_id: Optional[int]) -> list[dict[str, Any]]:
     return cast(
         list[dict[str, Any]],
         _get_actual_body(
-            _client.post(
+            client.post(
                 _build_url("getUpdates"),
                 json=body,
                 timeout=12,
@@ -54,9 +58,10 @@ def handle_updates(
     should_run: Callable[[], bool],
     handler: Callable[[dict[str, Any]], None],
 ) -> None:
+    client = httpx.Client(timeout=30)
     last_update_id: Optional[int] = None
     while should_run():
-        updates = _request_updates(last_update_id)
+        updates = _request_updates(client, last_update_id)
         try:
             for update in updates:
                 _LOG.info(f"Received update: {update}")
