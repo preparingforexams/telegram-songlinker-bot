@@ -2,20 +2,21 @@ import logging
 from typing import Any, Callable, Optional, cast
 
 import httpx
-from bs_config import Env
+
+from songlinker.config import Config
 
 _API_KEY = ""
 _LOG = logging.getLogger(__name__)
 _client = httpx.Client(timeout=30)
 
 
-def init(env: Env) -> None:
+def init(config: Config) -> None:
     global _API_KEY
 
     if _API_KEY:
         raise RuntimeError("Tried to initialize telegram library multiple times")
 
-    _API_KEY = env.get_string("TELEGRAM_API_KEY", required=True)
+    _API_KEY = config.telegram_api_key
 
 
 def _build_url(method: str) -> str:

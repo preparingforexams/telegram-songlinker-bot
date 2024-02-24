@@ -5,9 +5,8 @@ from dataclasses import dataclass
 from typing import Any, Iterable, Self, cast
 from urllib import parse
 
-from bs_config import Env
-
 from songlinker import telegram
+from songlinker.config import Config
 from songlinker.link_api import IoException, LinkApi, Platform, SongData
 
 _LOG = logging.getLogger(__name__)
@@ -15,13 +14,13 @@ _LOG = logging.getLogger(__name__)
 _api_key = ""
 
 
-def handle_updates(env: Env) -> None:
+def handle_updates(config: Config) -> None:
     global _api_key
     if _api_key:
         raise RuntimeError("Already running")
-    _api_key = env.get_string("SONGLINK_API_TOKEN", required=True)
+    _api_key = config.songlinker_api_key
 
-    telegram.init(env)
+    telegram.init(config)
     telegram.handle_updates(
         lambda: True,
         _handle_update,
