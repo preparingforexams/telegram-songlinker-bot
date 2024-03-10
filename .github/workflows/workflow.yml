@@ -6,23 +6,13 @@ on:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
-    container: python:3.12-slim-bullseye
-    steps:
-      - name: Install Poetry
-        run: pip install poetry==1.8.2
-      - uses: actions/checkout@v4
-      - run: poetry install
-      - name: Check coding standards
-        run: |
-          poetry run ruff check src/
-          poetry run black --check src/
-          poetry run mypy src/
+    uses: BlindfoldedSurgery/actions-python/.github/workflows/lint.yml@v1
+    with:
+      python-version: '3.12'
 
   integration-test:
     runs-on: ubuntu-latest
-    if: github.ref_name == github.event.repository.default_branch
-    container: python:3.12-slim-bullseye
+    container: python:3.12-slim-bookworm
     steps:
       - name: Install Poetry
         run: pip install poetry==1.8.2
@@ -35,7 +25,7 @@ jobs:
 
   unit-test:
     runs-on: ubuntu-latest
-    container: python:3.12-slim-bullseye
+    container: python:3.12-slim-bookworm
     steps:
       - name: Install Poetry
         run: pip install poetry==1.8.2
@@ -45,49 +35,22 @@ jobs:
         run: poetry run pytest -m "not integration" src/
 
   build-container-image:
-    runs-on: ubuntu-latest
-    if: success() && github.event_name == 'pull_request'
     needs:
       - lint
       - unit-test
-    steps:
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v4
-      - name: Build container image
-        uses: docker/build-push-action@v5
-        with:
-          push: false
-          tags: "ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ github.sha }}"
-
-  push-container-image:
-    runs-on: ubuntu-latest
-    if: success() && github.ref_name == github.event.repository.default_branch
-    needs:
       - integration-test
-      - lint
-      - unit-test
-    steps:
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v4
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ github.token }}
-      - name: Build and push container image
-        uses: docker/build-push-action@v5
-        with:
-          push: true
-          build-args: |
-            APP_VERSION=${{ github.sha }}
-          tags: "ghcr.io/${{ env.GITHUB_REPOSITORY_OWNER_PART_SLUG }}/${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}:${{ github.sha }}"
+    uses: BlindfoldedSurgery/actions-container/.github/workflows/build-image-docker.yml@v3
+    with:
+      platform: "linux/arm64"
+      push-image: ${{ github.ref_name == github.event.repository.default_branch }}
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: born-prep
+    container: ghcr.io/bjoernpetersen/helm:2.0.1
     needs:
-      - push-container-image
+      - build-container-image
     concurrency: production
+    if: success() && github.ref_name == github.event.repository.default_branch
     steps:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4
@@ -102,20 +65,10 @@ jobs:
           TELEGRAM_API_TOKEN: ${{ secrets.TELEGRAM_API_TOKEN }}
       - uses: WyriHaximus/github-action-helm3@v4
         with:
-          exec: helm upgrade bot . --install --namespace=telegram-songlinker-bot --atomic
-          kubeconfig: '${{ secrets.KUBECONFIG_RAW }}'
+          exec: helm upgrade bot . --install --namespace=songlinker-bot --atomic
+          kubeconfig: '${{ secrets.BORN_KUBECONFIG_RAW }}'
 
   clean:
-    runs-on: ubuntu-latest
     concurrency: cleanup
-    continue-on-error: true
     needs: [ deploy ]
-    steps:
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v4
-      - name: Clean up old app container images
-        uses: actions/delete-package-versions@v5
-        with:
-          package-name: ${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}
-          package-type: container
-          min-versions-to-keep: 10
+    uses: BlindfoldedSurgery/actions-container/.github/workflows/clean.yml@v3
