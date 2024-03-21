@@ -5,6 +5,9 @@ on:
   pull_request: { }
 
 jobs:
+  validate-renovate-config:
+    uses: BlindfoldedSurgery/renovate-config/.github/workflows/validate.yml@main
+
   lint:
     uses: BlindfoldedSurgery/actions-python/.github/workflows/lint.yml@v1
     with:
