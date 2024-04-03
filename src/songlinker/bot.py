@@ -92,11 +92,11 @@ class SongResult:
             for platform, link in self.data.links.items()
         )
 
-        result = f"{prefix}{name}\n[{links}]"
+        header = f"{prefix}{name}"
         if self.is_spoiler:
-            return f"<tg-spoiler>{result}</tg-spoiler>"
-        else:
-            return result
+            header = f"<tg-spoiler>{header}</tg-spoiler>"
+
+        return f"{header}\n[{links}]"
 
     def to_inline_result(self) -> dict[str, Any]:
         artist = self.data.metadata.artist_name
