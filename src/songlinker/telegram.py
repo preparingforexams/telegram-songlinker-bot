@@ -5,6 +5,7 @@ import httpx
 from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 
 from songlinker.config import Config
+from songlinker.link_api import IoException
 
 _API_KEY = ""
 _LOG = logging.getLogger(__name__)
@@ -67,6 +68,8 @@ def handle_updates(
                 _LOG.info(f"Received update: {update}")
                 handler(update)
                 last_update_id = update["update_id"]
+        except IoException as e:
+            _LOG.error("Could not handle update due to IO exception", exc_info=e)
         except Exception as e:
             _LOG.error("Could not handle update", exc_info=e)
 
