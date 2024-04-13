@@ -1,8 +1,0 @@
-image: ${IMAGE_NAME}:${GITHUB_SHA}
-apiToken:
-  songlink: ${SONGLINK_API_TOKEN}
-  telegram: ${TELEGRAM_API_TOKEN}
-honeycomb:
-  team: ${HONEYCOMB_API_TOKEN}
-sentry:
-  dsn: ${SENTRY_DSN}

@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: {{ .Values.image }}
+          image: {{ .Values.imageName }}:{{ .Values.appVersion }}
           args:
             - handle-updates
           env:
