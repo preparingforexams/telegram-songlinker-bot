@@ -16,7 +16,7 @@ class Config:
     def from_env(cls, env: Env) -> Self:
         return cls(
             app_version=env.get_string("APP_VERSION", default="dirty"),
-            telegram_api_key=env.get_string("TELEGRAM_API_KEY", required=True),
+            telegram_api_key=env.get_string("TELEGRAM_TOKEN", required=True),
             songlinker_api_key=env.get_string("SONGLINK_API_TOKEN", required=True),
             sentry_dsn=env.get_string("SENTRY_DSN"),
             enable_telemetry=env.get_bool("ENABLE_TELEMETRY", default=False),

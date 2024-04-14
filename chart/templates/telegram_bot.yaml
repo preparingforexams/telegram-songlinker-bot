@@ -33,6 +33,4 @@ spec:
               value: https://api.honeycomb.io
           envFrom:
             - secretRef:
-                name: base
-            - secretRef:
-                name: telegram
+                name: secrets
