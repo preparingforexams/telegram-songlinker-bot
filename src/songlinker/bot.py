@@ -1,10 +1,10 @@
 import logging
 import uuid
 from collections import namedtuple
+from collections.abc import Iterable
 from dataclasses import dataclass
-from datetime import datetime
-from datetime import timezone as dt_timezone
-from typing import Any, Iterable, Self, cast
+from datetime import UTC, datetime
+from typing import Any, Self, cast
 from urllib import parse
 
 from opentelemetry import trace
@@ -54,7 +54,7 @@ def _collect_message_span_attributes(span: Span, message: dict[str, Any]) -> Non
     span.set_attribute("telegram.user_id", user_id)
     time = datetime.fromtimestamp(
         message["date"],
-        tz=dt_timezone.utc,
+        tz=UTC,
     )
     span.set_attribute("telegram.message_timestamp", time.isoformat())
     message_id = message["message_id"]

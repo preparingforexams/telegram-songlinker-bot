@@ -1,7 +1,8 @@
 from collections import namedtuple
+from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import Enum
-from typing import Annotated, Iterable, Self
+from typing import Annotated, Self
 
 import httpx
 from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor

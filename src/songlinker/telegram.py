@@ -1,5 +1,6 @@
 import logging
-from typing import Any, Callable, Optional, cast
+from collections.abc import Callable
+from typing import Any, cast
 
 import httpx
 from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
@@ -35,7 +36,7 @@ def _get_actual_body(response: httpx.Response) -> dict[str, Any] | list[Any]:
 
 
 def _request_updates(
-    client: httpx.Client, last_update_id: Optional[int]
+    client: httpx.Client, last_update_id: int | None
 ) -> list[dict[str, Any]]:
     body: dict[str, Any] | None = None
     if last_update_id:
@@ -60,7 +61,7 @@ def handle_updates(
     handler: Callable[[dict[str, Any]], None],
 ) -> None:
     client = httpx.Client(timeout=30)
-    last_update_id: Optional[int] = None
+    last_update_id: int | None = None
     while should_run():
         updates = _request_updates(client, last_update_id)
         try:
@@ -77,7 +78,7 @@ def handle_updates(
 def send_message(
     chat_id: int,
     text: str,
-    reply_to_message_id: Optional[int] = None,
+    reply_to_message_id: int | None = None,
     disable_web_page_preview: bool = False,
     disable_notification: bool = False,
     parse_mode: str | None = None,
