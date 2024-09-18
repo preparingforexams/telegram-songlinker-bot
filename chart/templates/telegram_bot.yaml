@@ -11,6 +11,7 @@ kind: StatefulSet
 metadata:
   name: telegram-bot
 spec:
+  revisionHistoryLimit: 2
   selector:
     matchLabels:
       app: telegram-bot
