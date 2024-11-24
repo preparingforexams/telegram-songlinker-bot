@@ -6,7 +6,7 @@ from typing import Annotated, Self
 
 import httpx
 from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
-from pydantic import AnyUrl, BaseModel, ConfigDict, Field, HttpUrl
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl
 from pydantic.alias_generators import to_camel
 
 
@@ -47,8 +47,8 @@ class PlatformMetadata(CamelCaseModel):
 class PlatformLink(CamelCaseModel):
     entity_unique_id: UniqueEntityId
     url: HttpUrl
-    native_app_uri_desktop: AnyUrl | None = None
-    native_app_uri_mobile: AnyUrl | None = None
+    native_app_uri_desktop: str | None = None
+    native_app_uri_mobile: str | None = None
 
 
 class LinkResponse(CamelCaseModel):
