@@ -23,7 +23,7 @@ opentelemetry-sdk = "~1.28"
 opentelemetry-exporter-otlp-proto-grpc = "~1.28"
 opentelemetry-instrumentation-httpx = "*"
 opentelemetry-instrumentation-logging = "*"
-pydantic = "^2.1.1"
+pydantic = "~2.9"
 sentry-sdk = "^2.0.0"
 
 [tool.poetry.group.dev.dependencies]
