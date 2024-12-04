@@ -6,14 +6,15 @@ RUN apt-get update -qq \
 
 COPY [ "uv.lock", "pyproject.toml", "./" ]
 
-RUN uv sync --locked --no-install-workspace --no-dev
+RUN uv sync --locked --no-install-workspace --all-extras --no-dev
 
 # We don't want the tests
 COPY src/songlinker ./src/songlinker
 
-RUN uv sync --locked --no-editable --no-dev
+RUN uv sync --locked --no-editable --all-extras --no-dev
 
 ARG APP_VERSION
 ENV APP_VERSION=$APP_VERSION
+ENV UV_NO_SYNC=true
 
 ENTRYPOINT [ "tini", "--", "uv", "run", "python", "-m", "songlinker" ]
