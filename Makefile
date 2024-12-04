@@ -3,19 +3,19 @@ check: lint test
 
 .PHONY: lint
 lint:
-	poetry run ruff format src/
-	poetry run ruff check --fix --show-fixes src/
-	poetry run mypy src/
+	uv run ruff format src/
+	uv run ruff check --fix --show-fixes src/
+	uv run mypy src/
 
 .PHONY: test
 test:
-	poetry run pytest --record-mode=new_episodes src/
+	uv run pytest --record-mode=new_episodes src/
 
 .PHONY: unit-test
 unit-test:
-	poetry run pytest -m "not integration" src/
+	uv run pytest -m "not integration" src/
 
 .PHONY: integration-test
 integration-test:
-	poetry run pytest -m "integration" --record-mode=new_episodes src/
+	uv run pytest -m "integration" --record-mode=new_episodes src/
 

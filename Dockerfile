@@ -1,15 +1,15 @@
-FROM ghcr.io/blindfoldedsurgery/poetry:2.1.1-pipx-3.13-bookworm
+FROM ghcr.io/astral-sh/uv:0.5-python3.13-bookworm-slim
 
-COPY [ "poetry.toml", "poetry.lock", "pyproject.toml", "./" ]
+COPY [ "uv.lock", "pyproject.toml", "./" ]
 
-RUN poetry install --no-interaction --ansi --only=main --no-root
+RUN uv sync --locked --no-install-workspace --no-dev
 
 # We don't want the tests
 COPY src/songlinker ./src/songlinker
 
-RUN poetry install --no-interaction --ansi --only-root
+RUN uv sync --locked --no-editable --no-dev
 
 ARG APP_VERSION
 ENV APP_VERSION=$APP_VERSION
 
-ENTRYPOINT [ "tini", "--", "poetry", "run", "python", "-m", "songlinker" ]
+ENTRYPOINT [ "tini", "--", "uv", "run", "python", "-m", "songlinker" ]
