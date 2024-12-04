@@ -15,28 +15,21 @@ jobs:
       python-version: '3.13'
 
   integration-test:
-    runs-on: ubuntu-latest
-    container: python:3.13-slim-bookworm
-    steps:
-      - name: Install uv
-        run: pipx install uv==0.5.6
-      - uses: actions/checkout@v4
-      - run: uv sync
-      - name: Run tests
-        env:
-          SONGLINK_API_TOKEN: ${{ secrets.SONGLINK_API_TOKEN }}
-        run: uv run pytest -m "integration" src/
+    uses: BlindfoldedSurgery/actions-python/.github/workflows/test.yml@v2
+    with:
+      build-tool: uv
+      python-version: '3.13'
+      tests-selector: integration
+    secrets:
+      ENVIRONMENT_VARIABLES: |
+        SONGLINK_API_TOKEN=${{ secrets.SONGLINK_API_TOKEN }}
 
   unit-test:
-    runs-on: ubuntu-latest
-    container: python:3.13-slim-bookworm
-    steps:
-      - name: Install uv
-        run: pipx install uv==0.5.6
-      - uses: actions/checkout@v4
-      - run: uv sync
-      - name: Run tests
-        run: uv run pytest -m "not integration" src/
+    uses: BlindfoldedSurgery/actions-python/.github/workflows/test.yml@v2
+    with:
+      build-tool: uv
+      python-version: '3.13'
+      tests-selector: not integration
 
   build-container-image:
     needs:
