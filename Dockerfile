@@ -21,6 +21,6 @@ RUN uv sync --locked --no-editable --all-extras --no-dev
 
 ARG APP_VERSION
 ENV APP_VERSION=$APP_VERSION
-ENV UV_NO_SYNC=true
 
+ENV UV_NO_SYNC=true
 ENTRYPOINT [ "tini", "--", "uv", "run", "-m", "songlinker" ]
