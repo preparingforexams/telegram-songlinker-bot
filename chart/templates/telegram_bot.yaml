@@ -22,6 +22,10 @@ spec:
       labels:
         app: telegram-bot
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsNonRoot: true
       containers:
         - name: app
           image: {{ .Values.imageName }}:{{ .Values.appVersion }}
@@ -35,3 +39,7 @@ spec:
           envFrom:
             - secretRef:
                 name: secrets
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ ALL ]
