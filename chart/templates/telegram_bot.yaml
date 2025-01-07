@@ -11,7 +11,7 @@ kind: StatefulSet
 metadata:
   name: telegram-bot
 spec:
-  revisionHistoryLimit: 2
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: telegram-bot
@@ -22,6 +22,7 @@ spec:
       labels:
         app: telegram-bot
     spec:
+      serviceAccountName: bot
       securityContext:
         seccompProfile:
           type: RuntimeDefault
