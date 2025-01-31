@@ -16,7 +16,7 @@ spec:
     matchLabels:
       app: telegram-bot
   serviceName: telegram-bot
-  replicas: 1
+  replicas: {{ if .Values.isEnabled }}1{{ else }}0{{ end }}
   template:
     metadata:
       labels:
