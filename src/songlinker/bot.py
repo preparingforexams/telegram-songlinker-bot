@@ -18,6 +18,7 @@ _LOG = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
 
 _api_key = ""
+_bot_username: str | None = None
 
 
 def handle_updates(config: Config) -> None:
@@ -261,6 +262,20 @@ def _collapse_entities(
 
 def _handle_message(message: dict[str, Any]) -> None:
     chat = message["chat"]
+
+    if via_bot := message.get("via_bot"):
+        global _bot_username
+        username = _bot_username
+
+        if not username:
+            bot = telegram.get_me()
+            username = bot["username"]
+            _bot_username = username
+
+        if username == via_bot["username"]:
+            _LOG.info("Skipping message that was sent via this bot")
+            return
+
     entities = message.get("entities")
     if not entities:
         _LOG.debug("No entities in message")

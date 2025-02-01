@@ -56,6 +56,17 @@ def _request_updates(
     )
 
 
+def get_me() -> dict[str, Any]:
+    return cast(
+        dict[str, Any],
+        _get_actual_body(
+            _client.post(
+                _build_url("getMe"),
+            )
+        ),
+    )
+
+
 def handle_updates(
     should_run: Callable[[], bool],
     handler: Callable[[dict[str, Any]], None],
