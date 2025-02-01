@@ -91,7 +91,7 @@ class SongLinks:
         )
 
     def __hash__(self) -> int:
-        return hash(list(self._link_by_platform.values()))
+        return hash(tuple(self._link_by_platform.values()))
 
 
 @dataclass(frozen=True)
