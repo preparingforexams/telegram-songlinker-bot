@@ -106,11 +106,19 @@ class SongResult:
             result_title = f"{artist} - {title}"
 
         thumbnail_data = {}
+        link_preview_options: dict[str, Any] = {
+            "is_disabled": True,
+        }
         if thumbnail := self.data.metadata.thumbnail:
             thumbnail_data = {
                 "thumbnail_url": thumbnail.url,
                 "thumbnail_width": thumbnail.width,
                 "thumbnail_height": thumbnail.height,
+            }
+
+            link_preview_options = {
+                "url": thumbnail.url,
+                "show_above_text": True,
             }
 
         return {
@@ -122,7 +130,7 @@ class SongResult:
             "input_message_content": {
                 "message_text": self.to_message_content(),
                 "parse_mode": "HTML",
-                "disable_web_page_preview": True,
+                "link_preview_options": link_preview_options,
             },
         }
 
