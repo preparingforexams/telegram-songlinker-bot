@@ -1,6 +1,6 @@
 import logging
 import uuid
-from collections import namedtuple
+from collections import OrderedDict, namedtuple
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -283,9 +283,26 @@ def _handle_message(message: dict[str, Any]) -> None:
         return
 
     with LinkApi(api_key=_api_key) as api:
-        results = (_build_result(api, match) for match in entity_matches)
+        results = [_build_result(api, match) for match in entity_matches]
+        deduped_results: dict[SongData, SongResult] = OrderedDict()
+        for result in results:
+            if result is None:
+                continue
+
+            old = deduped_results.get(result.data)
+
+            if old is None:
+                deduped_results[result.data] = result
+                continue
+
+            if old.is_spoiler:
+                continue
+
+            if result.is_spoiler:
+                deduped_results[result.data] = result
+
         message_contents = [
-            result.to_message_content() for result in results if result is not None
+            result.to_message_content() for result in deduped_results.values()
         ]
 
     if not message_contents:

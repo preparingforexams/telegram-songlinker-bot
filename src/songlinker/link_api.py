@@ -77,8 +77,17 @@ class SongLinks:
             key=lambda t: t[0].value.name,
         )
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, SongLinks):
+            return False
 
-@dataclass
+        return self.page == other.page
+
+    def __hash__(self) -> int:
+        return hash(self.page)
+
+
+@dataclass(frozen=True)
 class SongMetadata:
     type: str
     title: str
@@ -93,10 +102,19 @@ class SongMetadata:
         return self.type == "song"
 
 
-@dataclass
+@dataclass(eq=False, frozen=True)
 class SongData:
     links: SongLinks
     metadata: SongMetadata
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, SongData):
+            return False
+
+        return self.links == other.links
+
+    def __hash__(self) -> int:
+        return hash(self.links)
 
 
 class IoException(Exception):
