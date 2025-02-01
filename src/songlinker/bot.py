@@ -7,6 +7,7 @@ from datetime import UTC, datetime
 from typing import Any, Self, cast
 from urllib import parse
 
+import httpx
 from opentelemetry import trace
 from opentelemetry.trace import Span
 
@@ -176,10 +177,18 @@ def _handle_query(query: dict[str, Any]) -> None:
         except ValueError:
             pass
     results = [song_result.to_inline_result()] if song_result else []
-    telegram.answer_inline_query(
-        inline_query_id=query["id"],
-        results=results,
-    )
+    try:
+        telegram.answer_inline_query(
+            inline_query_id=query["id"],
+            results=results,
+        )
+    except httpx.HTTPStatusError as e:
+        _LOG.error("Could not answer inline query", exc_info=e)
+        if e.response.status_code == 400:
+            _LOG.warning("Ignoring bad request response")
+            return
+
+        raise e
 
 
 EntityPosition = namedtuple("EntityPosition", ["offset", "length"])
