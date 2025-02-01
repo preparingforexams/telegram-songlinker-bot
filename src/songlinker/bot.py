@@ -21,6 +21,19 @@ _api_key = ""
 _bot_username: str | None = None
 
 
+def _get_bot_username() -> str:
+    with tracer.start_as_current_span("get_bot_username"):
+        global _bot_username
+        username = _bot_username
+
+        if not username:
+            bot = telegram.get_me()
+            username = cast(str, bot["username"])
+            _bot_username = username
+
+        return username
+
+
 def handle_updates(config: Config) -> None:
     global _api_key
     if _api_key:
@@ -269,17 +282,20 @@ def _handle_message(message: dict[str, Any]) -> None:
     chat = message["chat"]
 
     if via_bot := message.get("via_bot"):
-        global _bot_username
-        username = _bot_username
-
-        if not username:
-            bot = telegram.get_me()
-            username = bot["username"]
-            _bot_username = username
-
-        if username == via_bot["username"]:
+        if _get_bot_username() == via_bot["username"]:
             _LOG.info("Skipping message that was sent via this bot")
             return
+
+    if forward_origin := message.get("forward_origin"):
+        match forward_origin["type"]:
+            case "user":
+                sender_user = forward_origin["sender_user"]
+                if _get_bot_username() == sender_user["username"]:
+                    _LOG.info("Skipping message forwarded from this bot")
+                    return
+            case "hidden_user":
+                user_name = forward_origin["sender_user_name"]
+                _LOG.info("Message was forwarded from hidden user %s", user_name)
 
     entities = message.get("entities")
     if not entities:
