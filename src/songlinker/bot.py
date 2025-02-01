@@ -104,11 +104,21 @@ class SongResult:
         result_title = self.data.links.page
         if artist and title:
             result_title = f"{artist} - {title}"
+
+        thumbnail_data = {}
+        if thumbnail := self.data.metadata.thumbnail:
+            thumbnail_data = {
+                "thumbnail_url": thumbnail.url,
+                "thumbnail_width": thumbnail.width,
+                "thumbnail_height": thumbnail.height,
+            }
+
         return {
             "type": "article",
             "id": _random_id(),
             "title": result_title,
             "url": self.data.links.page,
+            **thumbnail_data,
             "input_message_content": {
                 "message_text": self.to_message_content(),
                 "parse_mode": "HTML",

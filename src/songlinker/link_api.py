@@ -41,6 +41,11 @@ class PlatformMetadata(CamelCaseModel):
     title: str
     artist_name: str
     api_provider: str
+
+    thumbnail_url: str | None
+    thumbnail_width: float | int | None
+    thumbnail_height: float | int | None
+
     platforms: Annotated[list[str], Field(min_length=1)]
 
 
@@ -88,10 +93,18 @@ class SongLinks:
 
 
 @dataclass(frozen=True)
+class ThumbnailMetadata:
+    url: str
+    width: int | None
+    height: int | None
+
+
+@dataclass(frozen=True)
 class SongMetadata:
     type: str
     title: str
     artist_name: str | None
+    thumbnail: ThumbnailMetadata | None
 
     @property
     def is_album(self) -> bool:
@@ -162,11 +175,29 @@ class LinkApi:
             # If no preferred provider was found, use the first one
             _, entity = entities_by_unique_id.popitem()
 
+        thumbnail_url = entity.thumbnail_url
+        if thumbnail_url:
+            thumbnail = ThumbnailMetadata(
+                url=thumbnail_url,
+                width=self._number_to_int(entity.thumbnail_width),
+                height=self._number_to_int(entity.thumbnail_height),
+            )
+        else:
+            thumbnail = None
+
         return SongMetadata(
             type=entity.type,
             title=entity.title,
             artist_name=entity.artist_name,
+            thumbnail=thumbnail,
         )
+
+    @staticmethod
+    def _number_to_int(number: int | float | None) -> int | None:
+        if number is None:
+            return None
+
+        return int(number)
 
     def _extract_url(
         self,
