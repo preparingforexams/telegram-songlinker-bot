@@ -111,6 +111,11 @@ class SongResult:
             "is_disabled": True,
         }
         if thumbnail := self.data.metadata.thumbnail:
+            _LOG.info(
+                "Using thumbnail URL: %s (type: %s)",
+                thumbnail.url,
+                type(thumbnail.url),
+            )
             thumbnail_data = {
                 "thumbnail_url": thumbnail.url,
                 "thumbnail_width": thumbnail.width,
