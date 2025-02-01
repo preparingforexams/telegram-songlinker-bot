@@ -86,10 +86,12 @@ class SongLinks:
         if not isinstance(other, SongLinks):
             return False
 
-        return self._link_by_platform == other._link_by_platform
+        return set(self._link_by_platform.values()) == set(
+            other._link_by_platform.values()
+        )
 
     def __hash__(self) -> int:
-        return hash(self._link_by_platform)
+        return hash(list(self._link_by_platform.values()))
 
 
 @dataclass(frozen=True)
