@@ -299,7 +299,7 @@ def _handle_message(message: dict[str, Any]) -> None:
         match forward_origin["type"]:
             case "user":
                 sender_user = forward_origin["sender_user"]
-                if _get_bot_username() == sender_user["username"]:
+                if _get_bot_username() == sender_user.get("username"):
                     _LOG.info("Skipping message forwarded from this bot")
                     return
             case "hidden_user":
