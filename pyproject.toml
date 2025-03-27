@@ -18,7 +18,7 @@ dependencies = [
     "opentelemetry-exporter-otlp-proto-grpc ==1.31.*",
     "opentelemetry-instrumentation-httpx",
     "opentelemetry-instrumentation-logging",
-    "pydantic ==2.10.*",
+    "pydantic ==2.11.*",
     "sentry-sdk >=2.0.0, <3.0.0",
 ]
 
