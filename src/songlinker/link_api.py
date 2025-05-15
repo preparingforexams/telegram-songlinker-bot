@@ -29,6 +29,7 @@ PlatformSpec = namedtuple("PlatformSpec", ["id", "name"])
 
 class Platform(Enum):
     spotify = PlatformSpec("spotify", "Spotify")
+    amazon_music = PlatformSpec("amazonMusic", "Amazon Music")
     apple_music = PlatformSpec("appleMusic", "Apple Music")
     deezer = PlatformSpec("deezer", "Deezer")
     soundcloud = PlatformSpec("soundcloud", "SoundCloud")
@@ -164,7 +165,7 @@ class LinkApi:
         entities_by_unique_id: dict[str, PlatformMetadata],
     ) -> SongMetadata:
         entity: PlatformMetadata
-        for platform in ("spotify", "tidal", "appleMusic", "soundcloud", "youtube"):
+        for platform in ("spotify", "tidal", "appleMusic", "soundcloud", "amazonMusic", "youtube"):
             # first try our preferred providers
             link = links_by_platform.get(platform)
             if link is None:
