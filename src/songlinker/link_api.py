@@ -165,7 +165,14 @@ class LinkApi:
         entities_by_unique_id: dict[str, PlatformMetadata],
     ) -> SongMetadata:
         entity: PlatformMetadata
-        for platform in ("spotify", "tidal", "appleMusic", "soundcloud", "amazonMusic", "youtube"):
+        for platform in (
+            "spotify",
+            "tidal",
+            "appleMusic",
+            "soundcloud",
+            "amazonMusic",
+            "youtube",
+        ):
             # first try our preferred providers
             link = links_by_platform.get(platform)
             if link is None:
