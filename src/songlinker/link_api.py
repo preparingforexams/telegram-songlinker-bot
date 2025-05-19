@@ -5,9 +5,12 @@ from enum import Enum
 from typing import Annotated, Self
 
 import httpx
+from opentelemetry import trace
 from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl
 from pydantic.alias_generators import to_camel
+
+tracer = trace.get_tracer(__name__)
 
 
 class CamelCaseModel(BaseModel):
@@ -247,35 +250,36 @@ class LinkApi:
         )
 
     def lookup_links(self, url: str) -> SongData | None:
-        try:
-            response = self._client.get(
-                url=self.BASE_URL,
-                params={
-                    "url": url,
-                    "userCountry": "DE",
-                    "songIfSingle": "true",
-                    "key": self._api_key,
-                },
-            )
-        except httpx.RequestError as e:
-            raise IoException from e
-
-        status_code = response.status_code
-        if response.is_success:
-            return self._parse_response(response.content)
-        elif 400 <= status_code < 500:
+        with tracer.start_as_current_span("lookup_links"):
             try:
-                error = ErrorResponse.model_validate_json(response.content)
-                if error.code == "could_not_resolve_entity":
-                    return None
-                else:
-                    raise IoException(
-                        f"Client error during request:"
-                        f" {status_code}, code: {error.code}"
-                    )
-            except ValueError:
-                raise IoException(f"Client error during request: {status_code}")
-        elif 500 <= status_code < 600:
-            raise IoException(f"Received server error {status_code}")
-        else:
-            raise IoException(f"Unexpected response status: {status_code}")
+                response = self._client.get(
+                    url=self.BASE_URL,
+                    params={
+                        "url": url,
+                        "userCountry": "DE",
+                        "songIfSingle": "true",
+                        "key": self._api_key,
+                    },
+                )
+            except httpx.RequestError as e:
+                raise IoException from e
+
+            status_code = response.status_code
+            if response.is_success:
+                return self._parse_response(response.content)
+            elif 400 <= status_code < 500:
+                try:
+                    error = ErrorResponse.model_validate_json(response.content)
+                    if error.code == "could_not_resolve_entity":
+                        return None
+                    else:
+                        raise IoException(
+                            f"Client error during request:"
+                            f" {status_code}, code: {error.code}"
+                        )
+                except ValueError:
+                    raise IoException(f"Client error during request: {status_code}")
+            elif 500 <= status_code < 600:
+                raise IoException(f"Received server error {status_code}")
+            else:
+                raise IoException(f"Unexpected response status: {status_code}")

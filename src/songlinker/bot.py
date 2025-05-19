@@ -174,35 +174,38 @@ def _random_id() -> str:
 
 
 def _handle_query(query: dict[str, Any]) -> None:
-    query_text: str = query["query"].strip()
-    song_result: SongResult | None = None
-    if query_text:
+    with tracer.start_as_current_span("handle_query"):
+        query_text: str = query["query"].strip()
+        song_result: SongResult | None = None
+        if query_text:
+            try:
+                url = parse.urlparse(query_text)
+                if url.scheme == "http" or url.scheme == "https":
+                    with LinkApi(api_key=_api_key) as api:
+                        song_result = _build_result(
+                            api,
+                            EntityMatch(
+                                position=EntityPosition(
+                                    offset=0, length=len(query_text)
+                                ),
+                                url=query_text,
+                            ),
+                        )
+            except ValueError:
+                pass
+        results = [song_result.to_inline_result()] if song_result else []
         try:
-            url = parse.urlparse(query_text)
-            if url.scheme == "http" or url.scheme == "https":
-                with LinkApi(api_key=_api_key) as api:
-                    song_result = _build_result(
-                        api,
-                        EntityMatch(
-                            position=EntityPosition(offset=0, length=len(query_text)),
-                            url=query_text,
-                        ),
-                    )
-        except ValueError:
-            pass
-    results = [song_result.to_inline_result()] if song_result else []
-    try:
-        telegram.answer_inline_query(
-            inline_query_id=query["id"],
-            results=results,
-        )
-    except httpx.HTTPStatusError as e:
-        _LOG.error("Could not answer inline query", exc_info=e)
-        if e.response.status_code == 400:
-            _LOG.warning("Ignoring bad request response")
-            return
+            telegram.answer_inline_query(
+                inline_query_id=query["id"],
+                results=results,
+            )
+        except httpx.HTTPStatusError as e:
+            _LOG.error("Could not answer inline query", exc_info=e)
+            if e.response.status_code == 400:
+                _LOG.warning("Ignoring bad request response")
+                return
 
-        raise e
+            raise e
 
 
 EntityPosition = namedtuple("EntityPosition", ["offset", "length"])
@@ -302,98 +305,101 @@ def _collapse_entities(
 
 
 def _handle_message(message: dict[str, Any]) -> None:
-    chat = message["chat"]
+    with tracer.start_as_current_span("handle_message") as span:
+        chat = message["chat"]
 
-    if via_bot := message.get("via_bot"):
-        if _get_bot_username() == via_bot["username"]:
-            _LOG.info("Skipping message that was sent via this bot")
+        if via_bot := message.get("via_bot"):
+            if _get_bot_username() == via_bot["username"]:
+                _LOG.info("Skipping message that was sent via this bot")
+                return
+
+        if forward_origin := message.get("forward_origin"):
+            match forward_origin["type"]:
+                case "user":
+                    sender_user = forward_origin["sender_user"]
+                    if _get_bot_username() == sender_user.get("username"):
+                        _LOG.info("Skipping message forwarded from this bot")
+                        return
+                case "hidden_user":
+                    user_name = forward_origin["sender_user_name"]
+                    _LOG.info("Message was forwarded from hidden user %s", user_name)
+
+        entities = message.get("entities")
+        if not entities:
+            _LOG.debug("No entities in message")
             return
 
-    if forward_origin := message.get("forward_origin"):
-        match forward_origin["type"]:
-            case "user":
-                sender_user = forward_origin["sender_user"]
-                if _get_bot_username() == sender_user.get("username"):
-                    _LOG.info("Skipping message forwarded from this bot")
-                    return
-            case "hidden_user":
-                user_name = forward_origin["sender_user_name"]
-                _LOG.info("Message was forwarded from hidden user %s", user_name)
+        entity_by_position: dict[EntityPosition, EntityMatch] = {}
 
-    entities = message.get("entities")
-    if not entities:
-        _LOG.debug("No entities in message")
-        return
+        for entity in entities:
+            position = EntityPosition(
+                offset=entity["offset"],
+                length=entity["length"],
+            )
 
-    entity_by_position: dict[EntityPosition, EntityMatch] = {}
+            entity_match: EntityMatch
+            match entity["type"]:
+                case "url":
+                    url = _get_text(message, position)
+                    entity_match = EntityMatch(position=position, url=url)
+                case "text_link":
+                    entity_match = EntityMatch(position=position, url=entity["url"])
+                case "spoiler":
+                    entity_match = EntityMatch(position=position, is_spoiler=True)
+                case _:
+                    continue
 
-    for entity in entities:
-        position = EntityPosition(
-            offset=entity["offset"],
-            length=entity["length"],
+            existing_match = entity_by_position.get(position)
+            if existing_match is None:
+                entity_by_position[position] = entity_match
+            else:
+                entity_by_position[position] = existing_match.merge(entity_match)
+
+        _LOG.debug("Got %d entity matches", len(entity_by_position))
+
+        entity_matches = _collapse_entities(entity_by_position)
+
+        span.set_attribute("songlinker.url_entity_count", len(entities))
+
+        if not entity_matches:
+            _LOG.info("No URLs after filtering")
+            return
+
+        with LinkApi(api_key=_api_key) as api:
+            results = [_build_result(api, match) for match in entity_matches]
+            deduped_results: dict[SongData, SongResult] = OrderedDict()
+            for result in results:
+                if result is None:
+                    continue
+
+                old = deduped_results.get(result.data)
+
+                if old is None:
+                    deduped_results[result.data] = result
+                    continue
+
+                if old.is_spoiler:
+                    continue
+
+                if result.is_spoiler:
+                    deduped_results[result.data] = result
+
+            message_contents = [
+                result.to_message_content() for result in deduped_results.values()
+            ]
+
+        if not message_contents:
+            _LOG.info("No known songs found")
+            return
+
+        telegram.send_message(
+            chat_id=chat["id"],
+            reply_to_message_id=message["message_id"],
+            disable_web_page_preview=True,
+            disable_notification=True,
+            text=_build_message(message_contents),
+            parse_mode="HTML",
         )
-
-        entity_match: EntityMatch
-        match entity["type"]:
-            case "url":
-                url = _get_text(message, position)
-                entity_match = EntityMatch(position=position, url=url)
-            case "text_link":
-                entity_match = EntityMatch(position=position, url=entity["url"])
-            case "spoiler":
-                entity_match = EntityMatch(position=position, is_spoiler=True)
-            case _:
-                continue
-
-        existing_match = entity_by_position.get(position)
-        if existing_match is None:
-            entity_by_position[position] = entity_match
-        else:
-            entity_by_position[position] = existing_match.merge(entity_match)
-
-    _LOG.debug("Got %d entity matches", len(entity_by_position))
-
-    entity_matches = _collapse_entities(entity_by_position)
-
-    if not entity_matches:
-        _LOG.info("No URLs after filtering")
-        return
-
-    with LinkApi(api_key=_api_key) as api:
-        results = [_build_result(api, match) for match in entity_matches]
-        deduped_results: dict[SongData, SongResult] = OrderedDict()
-        for result in results:
-            if result is None:
-                continue
-
-            old = deduped_results.get(result.data)
-
-            if old is None:
-                deduped_results[result.data] = result
-                continue
-
-            if old.is_spoiler:
-                continue
-
-            if result.is_spoiler:
-                deduped_results[result.data] = result
-
-        message_contents = [
-            result.to_message_content() for result in deduped_results.values()
-        ]
-
-    if not message_contents:
-        _LOG.info("No known songs found")
-        return
-
-    telegram.send_message(
-        chat_id=chat["id"],
-        reply_to_message_id=message["message_id"],
-        disable_web_page_preview=True,
-        disable_notification=True,
-        text=_build_message(message_contents),
-        parse_mode="HTML",
-    )
 
 
 def _not_song_link(url: str) -> bool:
