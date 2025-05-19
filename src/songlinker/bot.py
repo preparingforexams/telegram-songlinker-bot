@@ -311,6 +311,7 @@ def _handle_message(message: dict[str, Any]) -> None:
         if via_bot := message.get("via_bot"):
             if _get_bot_username() == via_bot["username"]:
                 _LOG.info("Skipping message that was sent via this bot")
+                span.set_attribute("songlinker.skipped", True)
                 return
 
         if forward_origin := message.get("forward_origin"):
@@ -319,6 +320,7 @@ def _handle_message(message: dict[str, Any]) -> None:
                     sender_user = forward_origin["sender_user"]
                     if _get_bot_username() == sender_user.get("username"):
                         _LOG.info("Skipping message forwarded from this bot")
+                        span.set_attribute("songlinker.skipped", True)
                         return
                 case "hidden_user":
                     user_name = forward_origin["sender_user_name"]
@@ -327,6 +329,7 @@ def _handle_message(message: dict[str, Any]) -> None:
         entities = message.get("entities")
         if not entities:
             _LOG.debug("No entities in message")
+            span.set_attribute("songlinker.skipped", True)
             return
 
         entity_by_position: dict[EntityPosition, EntityMatch] = {}
@@ -363,6 +366,7 @@ def _handle_message(message: dict[str, Any]) -> None:
 
         if not entity_matches:
             _LOG.info("No URLs after filtering")
+            span.set_attribute("songlinker.skipped", True)
             return
 
         with LinkApi(api_key=_api_key) as api:
@@ -387,6 +391,8 @@ def _handle_message(message: dict[str, Any]) -> None:
             message_contents = [
                 result.to_message_content() for result in deduped_results.values()
             ]
+
+        span.set_attribute("songlinker.result_size", len(message_contents))
 
         if not message_contents:
             _LOG.info("No known songs found")
