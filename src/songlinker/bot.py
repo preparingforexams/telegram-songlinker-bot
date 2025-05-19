@@ -63,10 +63,24 @@ def _handle_update(update: dict[str, Any]) -> None:
 
 
 def _collect_message_span_attributes(span: Span, message: dict[str, Any]) -> None:
-    chat_id = message["chat"]["id"]
-    span.set_attribute("telegram.chat_id", chat_id)
-    user_id = message["from"]["id"]
+    user = message["from"]
+    user_id = user["id"]
     span.set_attribute("telegram.user_id", user_id)
+    user_name = user["first_name"]
+    if last_name := user.get("last_name"):
+        user_name = f"{user_name} {last_name}"
+    span.set_attribute("telegram.user_full_name", user_name)
+
+    if user_username := user.get("username"):
+        span.set_attribute("telegram.user_username", user_username)
+
+    chat = message["chat"]
+    chat_id = chat["id"]
+    span.set_attribute("telegram.chat_id", chat_id)
+    chat_name = chat.get("title") or user_name
+    if chat_name:
+        span.set_attribute("telegram.chat_name", chat_name)
+
     time = datetime.fromtimestamp(
         message["date"],
         tz=UTC,
