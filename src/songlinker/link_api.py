@@ -1,3 +1,4 @@
+import types
 from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import Enum
@@ -155,9 +156,9 @@ class LinkApi:
 
     def __exit__(
         self,
-        exc_type,  # pyright: ignore
-        exc_val,  # pyright: ignore
-        exc_tb,  # pyright: ignore
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: types.TracebackType | None,
     ) -> None:
         self.close()
 
