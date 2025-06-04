@@ -1,10 +1,10 @@
 import logging
 import uuid
-from collections import OrderedDict, namedtuple
+from collections import OrderedDict
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from typing import Any, Self, cast
+from typing import Any, NamedTuple, Self, cast
 from urllib import parse
 
 import httpx
@@ -60,6 +60,8 @@ def _handle_update(update: dict[str, Any]) -> None:
             case {"inline_query": inline_query} if inline_query:
                 _collect_inline_query_span_attributes(span, inline_query)
                 _handle_query(inline_query)
+            case _:
+                _LOG.debug("Ignoring unknown update type")
 
 
 def _collect_message_span_attributes(span: Span, message: dict[str, Any]) -> None:
@@ -208,7 +210,9 @@ def _handle_query(query: dict[str, Any]) -> None:
             raise e
 
 
-EntityPosition = namedtuple("EntityPosition", ["offset", "length"])
+class EntityPosition(NamedTuple):
+    offset: int
+    length: int
 
 
 @dataclass(frozen=True)
@@ -325,6 +329,8 @@ def _handle_message(message: dict[str, Any]) -> None:
                 case "hidden_user":
                     user_name = forward_origin["sender_user_name"]
                     _LOG.info("Message was forwarded from hidden user %s", user_name)
+                case other:
+                    _LOG.error("Unknown forward origin type: %s", other)
 
         entities = message.get("entities")
         if not entities:

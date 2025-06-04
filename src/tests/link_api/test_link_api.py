@@ -15,9 +15,9 @@ def api_token(require_integration) -> str:
 
 
 @pytest.fixture()
-def link_api(api_token) -> LinkApi:  # type: ignore
+def link_api(api_token) -> LinkApi:  # pyright: ignore[reportInvalidTypeForm]
     with LinkApi(api_key=api_token) as api:
-        yield api
+        yield api  # pyright: ignore[reportReturnType]
 
 
 def test_context_manager__works(mocker):

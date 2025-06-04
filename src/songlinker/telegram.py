@@ -20,7 +20,7 @@ def init(config: Config) -> None:
     if _API_KEY:
         raise RuntimeError("Tried to initialize telegram library multiple times")
 
-    _API_KEY = config.telegram_api_key
+    _API_KEY = config.telegram_api_key  # pyright: ignore[reportConstantRedefinition]
 
 
 def _build_url(method: str) -> str:
