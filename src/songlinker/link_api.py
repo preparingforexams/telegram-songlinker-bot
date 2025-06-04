@@ -1,8 +1,7 @@
-from collections import namedtuple
 from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import Enum
-from typing import Annotated, Self
+from typing import Annotated, NamedTuple, Self
 
 import httpx
 from opentelemetry import trace
@@ -27,7 +26,10 @@ UniqueEntityId = Annotated[
 
 NonEmptyString = Annotated[str, Field(min_length=1)]
 
-PlatformSpec = namedtuple("PlatformSpec", ["id", "name"])
+
+class PlatformSpec(NamedTuple):
+    id: str
+    name: str
 
 
 class Platform(Enum):
@@ -151,11 +153,11 @@ class LinkApi:
     def __enter__(self) -> Self:
         return self
 
-    def __exit__(  # type: ignore[no-untyped-def]
+    def __exit__(
         self,
-        exc_type,
-        exc_val,
-        exc_tb,
+        exc_type,  # pyright: ignore
+        exc_val,  # pyright: ignore
+        exc_tb,  # pyright: ignore
     ) -> None:
         self.close()
 

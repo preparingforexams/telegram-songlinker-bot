@@ -12,6 +12,7 @@ jobs:
     uses: BlindfoldedSurgery/actions-python/.github/workflows/lint.yml@v5
     with:
       build-tool: uv
+      type-checker: pyright
       python-version: '3.13'
 
   integration-test:
