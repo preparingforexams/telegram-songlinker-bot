@@ -30,8 +30,15 @@ def _setup_sentry(config: Config) -> None:
 
 
 @click.group()
-def app() -> None:
-    pass
+@click.pass_context
+def app(ctx: click.Context) -> None:
+    env = Env.load(include_default_dotenv=True)
+    config = Config.from_env(env)
+    _setup_logging()
+    _setup_sentry(config)
+    setup_tracing(config)
+
+    ctx.obj = config
 
 
 @app.command()
@@ -40,15 +47,5 @@ def handle_updates(obj: Config) -> None:
     bot.handle_updates(obj)
 
 
-def _main() -> None:
-    env = Env.load(include_default_dotenv=True)
-    config = Config.from_env(env)
-    _setup_logging()
-    _setup_sentry(config)
-    setup_tracing(config)
-
-    app.main(obj=config)
-
-
 if __name__ == "__main__":
-    _main()
+    app()
