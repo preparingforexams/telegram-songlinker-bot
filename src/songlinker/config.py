@@ -2,11 +2,13 @@ from dataclasses import dataclass
 from typing import Self
 
 from bs_config import Env
+from bs_nats_updater import NatsConfig
 
 
 @dataclass
 class Config:
     app_version: str
+    nats: NatsConfig
     telegram_api_key: str
     songlinker_api_key: str
     sentry_dsn: str | None
@@ -16,6 +18,7 @@ class Config:
     def from_env(cls, env: Env) -> Self:
         return cls(
             app_version=env.get_string("APP_VERSION", default="dirty"),
+            nats=NatsConfig.from_env(env.scoped("NATS_")),
             telegram_api_key=env.get_string("TELEGRAM_TOKEN", required=True),
             songlinker_api_key=env.get_string("SONGLINK_API_TOKEN", required=True),
             sentry_dsn=env.get_string("SENTRY_DSN"),
