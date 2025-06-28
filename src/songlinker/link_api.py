@@ -1,8 +1,7 @@
-import types
 from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import Enum
-from typing import Annotated, NamedTuple, Self
+from typing import Annotated, NamedTuple
 
 import httpx
 from opentelemetry import trace
@@ -148,22 +147,11 @@ class LinkApi:
 
     def __init__(self, api_key: str):
         self._api_key = api_key
-        self._client = httpx.Client(timeout=20)
+        self._client = httpx.AsyncClient(timeout=20)
         HTTPXClientInstrumentor().instrument_client(self._client)
 
-    def __enter__(self) -> Self:
-        return self
-
-    def __exit__(
-        self,
-        exc_type: type[BaseException] | None,
-        exc_val: BaseException | None,
-        exc_tb: types.TracebackType | None,
-    ) -> None:
-        self.close()
-
-    def close(self) -> None:
-        self._client.close()
+    async def close(self) -> None:
+        await self._client.aclose()
 
     def _extract_metadata(
         self,
@@ -215,8 +203,8 @@ class LinkApi:
 
         return int(number)
 
+    @staticmethod
     def _extract_url(
-        self,
         links_by_platform: dict[str, PlatformLink],
         platform: Platform,
     ) -> HttpUrl | None:
@@ -252,37 +240,37 @@ class LinkApi:
             links=links,
         )
 
-    def lookup_links(self, url: str) -> SongData | None:
-        with tracer.start_as_current_span("lookup_links"):
-            try:
-                response = self._client.get(
-                    url=self.BASE_URL,
-                    params={
-                        "url": url,
-                        "userCountry": "DE",
-                        "songIfSingle": "true",
-                        "key": self._api_key,
-                    },
-                )
-            except httpx.RequestError as e:
-                raise IoException from e
+    @tracer.start_as_current_span("lookup_links")
+    async def lookup_links(self, url: str) -> SongData | None:
+        try:
+            response = await self._client.get(
+                url=self.BASE_URL,
+                params={
+                    "url": url,
+                    "userCountry": "DE",
+                    "songIfSingle": "true",
+                    "key": self._api_key,
+                },
+            )
+        except httpx.RequestError as e:
+            raise IoException from e
 
-            status_code = response.status_code
-            if response.is_success:
-                return self._parse_response(response.content)
-            elif 400 <= status_code < 500:
-                try:
-                    error = ErrorResponse.model_validate_json(response.content)
-                    if error.code == "could_not_resolve_entity":
-                        return None
-                    else:
-                        raise IoException(
-                            f"Client error during request:"
-                            f" {status_code}, code: {error.code}"
-                        )
-                except ValueError:
-                    raise IoException(f"Client error during request: {status_code}")
-            elif 500 <= status_code < 600:
-                raise IoException(f"Received server error {status_code}")
-            else:
-                raise IoException(f"Unexpected response status: {status_code}")
+        status_code = response.status_code
+        if response.is_success:
+            return self._parse_response(response.content)
+        elif 400 <= status_code < 500:
+            try:
+                error = ErrorResponse.model_validate_json(response.content)
+                if error.code == "could_not_resolve_entity":
+                    return None
+                else:
+                    raise IoException(
+                        f"Client error during request:"
+                        f" {status_code}, code: {error.code}"
+                    )
+            except ValueError:
+                raise IoException(f"Client error during request: {status_code}")
+        elif 500 <= status_code < 600:
+            raise IoException(f"Received server error {status_code}")
+        else:
+            raise IoException(f"Unexpected response status: {status_code}")

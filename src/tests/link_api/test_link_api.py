@@ -1,8 +1,8 @@
 import os
-from unittest.mock import MagicMock
 
 import httpx
 import pytest
+import pytest_asyncio
 
 from songlinker.link_api import IoException, LinkApi, Platform
 
@@ -14,47 +14,56 @@ def api_token(require_integration) -> str:
     return result
 
 
-@pytest.fixture()
-def link_api(api_token) -> LinkApi:  # pyright: ignore[reportInvalidTypeForm]
-    with LinkApi(api_key=api_token) as api:
+@pytest_asyncio.fixture()
+async def link_api(api_token) -> LinkApi:  # pyright: ignore[reportInvalidTypeForm]
+    api = LinkApi(api_key=api_token)
+    try:
         yield api  # pyright: ignore[reportReturnType]
+    finally:
+        await api.close()
 
 
-def test_context_manager__works(mocker):
-    close: MagicMock = mocker.spy(LinkApi, "close")
-
-    with LinkApi(api_key="fake") as api:
-        assert isinstance(api, LinkApi)
-        close.assert_not_called()
-
-    close.assert_called_once()
-
-
-def test_request_io_error(mocker):
-    with LinkApi(api_key="fake") as api:
-        _client = mocker.patch.object(api, "_client")
-        _client.get.side_effect = httpx.RequestError("Test")
-        with pytest.raises(IoException):
-            api.lookup_links("https://open.spotify.com/track/0d28khcov6AiegSCpG5TuT")
+@pytest_asyncio.fixture()
+async def invalid_api() -> LinkApi:  # pyright: ignore[reportInvalidTypeForm]
+    api = LinkApi(api_key="invalid")
+    try:
+        yield api  # pyright: ignore[reportReturnType]
+    finally:
+        await api.close()
 
 
-def test_server_error(mocker):
-    with LinkApi(api_key="fake") as api:
-        _client = mocker.patch.object(api, "_client")
-        response = mocker.MagicMock(
+@pytest.mark.asyncio
+async def test_request_io_error(mocker, invalid_api):
+    _client = mocker.patch.object(invalid_api, "_client", autospec=True)
+    _client.get.side_effect = httpx.RequestError("Test")
+    with pytest.raises(IoException):
+        await invalid_api.lookup_links(
+            "https://open.spotify.com/track/0d28khcov6AiegSCpG5TuT"
+        )
+
+
+@pytest.mark.asyncio
+async def test_server_error(mocker, invalid_api):
+    _client = mocker.patch.object(invalid_api, "_client", autospec=True)
+    get_mock = mocker.AsyncMock(
+        return_value=mocker.MagicMock(
             spec=httpx.Response,
             is_success=False,
             status_code=502,
+        ),
+    )
+    _client.get = get_mock
+    with pytest.raises(IoException):
+        await invalid_api.lookup_links(
+            "https://open.spotify.com/track/0d28khcov6AiegSCpG5TuT"
         )
-        _client.get.return_value = response
-        with pytest.raises(IoException):
-            api.lookup_links("https://open.spotify.com/track/0d28khcov6AiegSCpG5TuT")
 
 
 @pytest.mark.default_cassette("TestLinkApi.yaml")
 @pytest.mark.integration
 @pytest.mark.vcr
 class TestLinkApi:
+    @pytest.mark.asyncio
     @pytest.mark.parametrize(
         "url,title,artist",
         [
@@ -75,8 +84,8 @@ class TestLinkApi:
             ),
         ],
     )
-    def test_lookup_links_has_all_links(self, link_api, url, title, artist):
-        data = link_api.lookup_links(url)
+    async def test_lookup_links_has_all_links(self, link_api, url, title, artist):
+        data = await link_api.lookup_links(url)
         assert data is not None
 
         links = data.links
@@ -87,10 +96,14 @@ class TestLinkApi:
         assert metadata.title == title
         assert metadata.artist_name == artist
 
-    def test_lookup_youtube_only(self, link_api):
-        data = link_api.lookup_links("https://www.youtube.com/watch?v=0_S3ytsXlIA")
+    @pytest.mark.asyncio
+    async def test_lookup_youtube_only(self, link_api):
+        data = await link_api.lookup_links(
+            "https://www.youtube.com/watch?v=0_S3ytsXlIA"
+        )
         assert data is None
 
-    def test_lookup_non_song(self, link_api):
-        data = link_api.lookup_links("https://google.com")
+    @pytest.mark.asyncio
+    async def test_lookup_non_song(self, link_api):
+        data = await link_api.lookup_links("https://google.com")
         assert data is None

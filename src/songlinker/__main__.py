@@ -1,13 +1,14 @@
+import asyncio
 import logging
 
 import click
 import sentry_sdk
+import uvloop
 from bs_config import Env
 
+from songlinker.bot import Bot
 from songlinker.config import Config
 from songlinker.tracing import setup_tracing
-
-from . import bot
 
 _LOG = logging.getLogger("songlinker")
 
@@ -32,6 +33,8 @@ def _setup_sentry(config: Config) -> None:
 @click.group()
 @click.pass_context
 def app(ctx: click.Context) -> None:
+    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+
     env = Env.load(include_default_dotenv=True)
     config = Config.from_env(env)
     _setup_logging()
@@ -44,7 +47,8 @@ def app(ctx: click.Context) -> None:
 @app.command()
 @click.pass_obj
 def handle_updates(obj: Config) -> None:
-    bot.handle_updates(obj)
+    bot = Bot(obj)
+    bot.handle_updates()
 
 
 if __name__ == "__main__":

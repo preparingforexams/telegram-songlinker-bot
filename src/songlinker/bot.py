@@ -1,104 +1,74 @@
+import asyncio
 import logging
+import signal
 import uuid
 from collections import OrderedDict
-from collections.abc import Iterable
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
-from datetime import UTC, datetime
 from typing import Any, NamedTuple, Self, cast
 from urllib import parse
 
-import httpx
+from bs_nats_updater import create_updater
 from opentelemetry import trace
-from opentelemetry.trace import Span
+from telegram import (
+    Bot as TelegramBot,
+)
+from telegram import (
+    InlineQueryResult,
+    InlineQueryResultArticle,
+    InputTextMessageContent,
+    LinkPreviewOptions,
+    MessageOriginHiddenUser,
+    MessageOriginUser,
+    Update,
+)
+from telegram.constants import ParseMode
+from telegram.ext import (
+    Application,
+    ContextTypes,
+    InlineQueryHandler,
+    MessageHandler,
+    filters,
+)
 
-from songlinker import telegram
 from songlinker.config import Config
 from songlinker.link_api import IoException, LinkApi, Platform, SongData
+from songlinker.tracing import InstrumentedHttpxRequest
 
 _LOG = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
 
-_api_key = ""
-_bot_username: str | None = None
 
+@asynccontextmanager
+async def telegram_span(*, update: Update, name: str) -> AsyncIterator[trace.Span]:
+    with tracer.start_as_current_span(name) as span:
+        span.set_attribute(
+            "telegram.update_keys",
+            list(update.to_dict(recursive=False).keys()),
+        )
+        span.set_attribute("telegram.update_id", update.update_id)
 
-def _get_bot_username() -> str:
-    with tracer.start_as_current_span("get_bot_username"):
-        global _bot_username
-        username = _bot_username
+        if message := update.effective_message:
+            span.set_attribute("telegram.message_id", message.message_id)
+            span.set_attribute("telegram.message_timestamp", message.date.isoformat())
 
-        if not username:
-            bot = telegram.get_me()
-            username = cast(str, bot["username"])
-            _bot_username = username
+        if chat := update.effective_chat:
+            span.set_attribute("telegram.chat_id", chat.id)
+            span.set_attribute("telegram.chat_type", chat.type)
+            if chat_name := chat.effective_name:
+                span.set_attribute("telegram.chat_name", chat_name)
 
-        return username
+        if user := update.effective_user:
+            span.set_attribute("telegram.user_id", user.id)
+            span.set_attribute("telegram.user_full_name", user.full_name)
+            if user_username := user.username:
+                span.set_attribute("telegram.user_username", user_username)
 
+        if query := update.inline_query:
+            span.set_attribute("telegram.query_id", query.id)
 
-def handle_updates(config: Config) -> None:
-    global _api_key
-    if _api_key:
-        raise RuntimeError("Already running")
-    _api_key = config.songlinker_api_key
-
-    telegram.init(config)
-    telegram.handle_updates(
-        lambda: True,
-        _handle_update,
-    )
-
-
-def _handle_update(update: dict[str, Any]) -> None:
-    with tracer.start_as_current_span("handle_update") as span:
-        span.set_attribute("telegram.update_keys", list(update.keys()))
-        span.set_attribute("telegram.update_id", update["update_id"])
-
-        match update:
-            case {"message": message} if message:
-                _collect_message_span_attributes(span, message)
-                _handle_message(message)
-            case {"inline_query": inline_query} if inline_query:
-                _collect_inline_query_span_attributes(span, inline_query)
-                _handle_query(inline_query)
-            case _:
-                _LOG.debug("Ignoring unknown update type")
-
-
-def _collect_message_span_attributes(span: Span, message: dict[str, Any]) -> None:
-    user = message["from"]
-    user_id = user["id"]
-    span.set_attribute("telegram.user_id", user_id)
-    user_name = user["first_name"]
-    if last_name := user.get("last_name"):
-        user_name = f"{user_name} {last_name}"
-    span.set_attribute("telegram.user_full_name", user_name)
-
-    if user_username := user.get("username"):
-        span.set_attribute("telegram.user_username", user_username)
-
-    chat = message["chat"]
-    chat_id = chat["id"]
-    span.set_attribute("telegram.chat_id", chat_id)
-    chat_name = chat.get("title") or user_name
-    if chat_name:
-        span.set_attribute("telegram.chat_name", chat_name)
-
-    time = datetime.fromtimestamp(
-        message["date"],
-        tz=UTC,
-    )
-    span.set_attribute("telegram.message_timestamp", time.isoformat())
-    message_id = message["message_id"]
-    span.set_attribute("telegram.message_id", message_id)
-
-
-def _collect_inline_query_span_attributes(span: Span, query: dict[str, Any]) -> None:
-    query_id = query["id"]
-    span.set_attribute("telegram.query_id", query_id)
-    chat_type = query["chat_type"]
-    span.set_attribute("telegram.chat_type", chat_type)
-    user_id = query["from"]["id"]
-    span.set_attribute("telegram.user_id", user_id)
+        yield span
 
 
 class SongResult:
@@ -129,7 +99,7 @@ class SongResult:
 
         return f"{header}\n[{links}]"
 
-    def to_inline_result(self) -> dict[str, Any]:
+    def to_inline_result(self) -> InlineQueryResult:
         artist = self.data.metadata.artist_name
         title = self.data.metadata.title
         result_title = self.data.links.page
@@ -137,9 +107,8 @@ class SongResult:
             result_title = f"{artist} - {title}"
 
         thumbnail_data = {}
-        link_preview_options: dict[str, Any] = {
-            "is_disabled": True,
-        }
+        link_preview_options = LinkPreviewOptions(is_disabled=True)
+
         if thumbnail := self.data.metadata.thumbnail:
             _LOG.info(
                 "Using thumbnail URL: %s (type: %s)",
@@ -152,62 +121,22 @@ class SongResult:
                 "thumbnail_height": thumbnail.height,
             }
 
-            link_preview_options = {
-                "url": thumbnail.url,
-                "show_above_text": True,
-            }
-
-        return {
-            "type": "article",
-            "id": _random_id(),
-            "title": result_title,
-            "url": self.data.links.page,
-            **thumbnail_data,
-            "input_message_content": {
-                "message_text": self.to_message_content(),
-                "parse_mode": "HTML",
-                "link_preview_options": link_preview_options,
-            },
-        }
-
-
-def _random_id() -> str:
-    return str(uuid.uuid4())
-
-
-def _handle_query(query: dict[str, Any]) -> None:
-    with tracer.start_as_current_span("handle_query"):
-        query_text: str = query["query"].strip()
-        song_result: SongResult | None = None
-        if query_text:
-            try:
-                url = parse.urlparse(query_text)
-                if url.scheme == "http" or url.scheme == "https":
-                    with LinkApi(api_key=_api_key) as api:
-                        song_result = _build_result(
-                            api,
-                            EntityMatch(
-                                position=EntityPosition(
-                                    offset=0, length=len(query_text)
-                                ),
-                                url=query_text,
-                            ),
-                        )
-            except ValueError:
-                pass
-        results = [song_result.to_inline_result()] if song_result else []
-        try:
-            telegram.answer_inline_query(
-                inline_query_id=query["id"],
-                results=results,
+            link_preview_options = LinkPreviewOptions(
+                url=thumbnail.url,
+                show_above_text=True,
             )
-        except httpx.HTTPStatusError as e:
-            _LOG.error("Could not answer inline query", exc_info=e)
-            if e.response.status_code == 400:
-                _LOG.warning("Ignoring bad request response")
-                return
 
-            raise e
+        return InlineQueryResultArticle(
+            id=str(uuid.uuid4()),
+            title=result_title,
+            url=self.data.links.page,
+            input_message_content=InputTextMessageContent(
+                message_text=self.to_message_content(),
+                parse_mode="HTML",
+                link_preview_options=link_preview_options,
+            ),
+            **thumbnail_data,  # pyright: ignore
+        )
 
 
 class EntityPosition(NamedTuple):
@@ -273,11 +202,6 @@ class EntityMatch:
         return True
 
 
-def _get_text(message: dict[str, Any], position: EntityPosition) -> str:
-    text: str = cast(str, message["text"])
-    return text[position.offset : position.offset + position.length]
-
-
 def _spoil_if_match(
     match: EntityMatch,
     spoiler_matches: list[EntityMatch],
@@ -304,79 +228,132 @@ def _collapse_entities(
             entity_by_position.values(),
             key=lambda match: match.position.offset,
         )
-        if match.url is not None and _not_song_link(match.require_url())
+        if match.url is not None and ("song.link" not in match.require_url())
     ]
 
 
-def _handle_message(message: dict[str, Any]) -> None:
-    with tracer.start_as_current_span("handle_message") as span:
-        chat = message["chat"]
+class Bot:
+    def __init__(self, config: Config) -> None:
+        bot = TelegramBot(
+            token=config.telegram_api_key,
+            request=InstrumentedHttpxRequest(connection_pool_size=2),
+        )
+        self._bot = bot
+        self._link_api = LinkApi(config.songlinker_api_key)
 
-        if via_bot := message.get("via_bot"):
-            if _get_bot_username() == via_bot["username"]:
-                _LOG.info("Skipping message that was sent via this bot")
+        app = (
+            Application.builder()
+            .post_shutdown(self._close)  # pyright: ignore[reportUnknownMemberType]
+            .updater(create_updater(bot, config.nats))
+            .build()
+        )
+        self._app = app
+
+        app.add_handler(InlineQueryHandler(callback=self._on_inline_query))
+        app.add_handler(
+            MessageHandler(
+                filters=filters.TEXT & ~filters.UpdateType.EDITED,
+                callback=self._on_message_update,
+                block=False,
+            )
+        )
+
+    async def _close(self, _: Any = None) -> None:
+        _LOG.info("Closing bot")
+        await self._link_api.close()
+
+    def handle_updates(self) -> None:
+        _LOG.info("Starting bot")
+        self._app.run_polling(
+            stop_signals=[
+                signal.SIGINT,
+                signal.SIGTERM,
+            ]
+        )
+
+    async def _on_message_update(
+        self,
+        update: Update,
+        context: ContextTypes.DEFAULT_TYPE,
+    ) -> None:
+        async with telegram_span(update=update, name="on_message_update") as span:
+            message = update.message
+            if message is None:
+                raise RuntimeError("No message")
+
+            if via_bot := message.via_bot:
+                if self._bot.username == via_bot.username:
+                    _LOG.info("Skipping message that was sent via this bot")
+                    span.set_attribute("songlinker.skipped", True)
+                    return
+
+            if forward_origin := message.forward_origin:
+                match forward_origin:
+                    case MessageOriginUser():
+                        sender_user = forward_origin.sender_user
+                        if self._bot.username == sender_user.username:
+                            _LOG.info("Skipping message forwarded from this bot")
+                            span.set_attribute("songlinker.skipped", True)
+                            return
+                    case MessageOriginHiddenUser():
+                        user_name = forward_origin.sender_user_name
+                        _LOG.info(
+                            "Message was forwarded from hidden user %s", user_name
+                        )
+                    case other:
+                        _LOG.error("Unknown forward origin type: %s", other)
+
+            entities = message.entities
+            if not entities:
+                _LOG.debug("No entities in message")
                 span.set_attribute("songlinker.skipped", True)
                 return
 
-        if forward_origin := message.get("forward_origin"):
-            match forward_origin["type"]:
-                case "user":
-                    sender_user = forward_origin["sender_user"]
-                    if _get_bot_username() == sender_user.get("username"):
-                        _LOG.info("Skipping message forwarded from this bot")
-                        span.set_attribute("songlinker.skipped", True)
-                        return
-                case "hidden_user":
-                    user_name = forward_origin["sender_user_name"]
-                    _LOG.info("Message was forwarded from hidden user %s", user_name)
-                case other:
-                    _LOG.error("Unknown forward origin type: %s", other)
+            entity_by_position: dict[EntityPosition, EntityMatch] = {}
 
-        entities = message.get("entities")
-        if not entities:
-            _LOG.debug("No entities in message")
-            span.set_attribute("songlinker.skipped", True)
-            return
+            for entity in entities:
+                position = EntityPosition(
+                    offset=entity.offset,
+                    length=entity.length,
+                )
 
-        entity_by_position: dict[EntityPosition, EntityMatch] = {}
+                entity_match: EntityMatch
+                match entity.type:
+                    case "url":
+                        url = message.parse_entity(entity)
+                        entity_match = EntityMatch(position=position, url=url)
+                    case "text_link":
+                        entity_match = EntityMatch(position=position, url=entity.url)
+                    case "spoiler":
+                        entity_match = EntityMatch(position=position, is_spoiler=True)
+                    case _:
+                        continue
 
-        for entity in entities:
-            position = EntityPosition(
-                offset=entity["offset"],
-                length=entity["length"],
-            )
+                existing_match = entity_by_position.get(position)
+                if existing_match is None:
+                    entity_by_position[position] = entity_match
+                else:
+                    entity_by_position[position] = existing_match.merge(entity_match)
 
-            entity_match: EntityMatch
-            match entity["type"]:
-                case "url":
-                    url = _get_text(message, position)
-                    entity_match = EntityMatch(position=position, url=url)
-                case "text_link":
-                    entity_match = EntityMatch(position=position, url=entity["url"])
-                case "spoiler":
-                    entity_match = EntityMatch(position=position, is_spoiler=True)
-                case _:
-                    continue
+            _LOG.debug("Got %d entity matches", len(entity_by_position))
 
-            existing_match = entity_by_position.get(position)
-            if existing_match is None:
-                entity_by_position[position] = entity_match
-            else:
-                entity_by_position[position] = existing_match.merge(entity_match)
+            entity_matches = _collapse_entities(entity_by_position)
 
-        _LOG.debug("Got %d entity matches", len(entity_by_position))
+            span.set_attribute("songlinker.url_entity_count", len(entities))
 
-        entity_matches = _collapse_entities(entity_by_position)
+            if not entity_matches:
+                _LOG.info("No URLs after filtering")
+                span.set_attribute("songlinker.skipped", True)
+                return
 
-        span.set_attribute("songlinker.url_entity_count", len(entities))
+            tasks: list[asyncio.Task[SongResult | None]] = []
+            async with asyncio.TaskGroup() as tg:
+                for match in entity_matches:
+                    task = tg.create_task(self._build_result(match))
+                    tasks.append(task)
 
-        if not entity_matches:
-            _LOG.info("No URLs after filtering")
-            span.set_attribute("songlinker.skipped", True)
-            return
+            results = [t.result() for t in tasks]
 
-        with LinkApi(api_key=_api_key) as api:
-            results = [_build_result(api, match) for match in entity_matches]
             deduped_results: dict[SongData, SongResult] = OrderedDict()
             for result in results:
                 if result is None:
@@ -398,41 +375,70 @@ def _handle_message(message: dict[str, Any]) -> None:
                 result.to_message_content() for result in deduped_results.values()
             ]
 
-        span.set_attribute("songlinker.result_size", len(message_contents))
+            span.set_attribute("songlinker.result_size", len(message_contents))
 
-        if not message_contents:
-            _LOG.info("No known songs found")
-            return
+            if not message_contents:
+                _LOG.info("No known songs found")
+                return
 
-        telegram.send_message(
-            chat_id=chat["id"],
-            reply_to_message_id=message["message_id"],
-            disable_web_page_preview=True,
-            disable_notification=True,
-            text=_build_message(message_contents),
-            parse_mode="HTML",
-        )
+            await message.reply_text(
+                parse_mode=ParseMode.HTML,
+                text="\n\n".join(message_contents),
+                link_preview_options=LinkPreviewOptions(
+                    is_disabled=True,
+                ),
+                disable_notification=True,
+            )
 
+    async def _on_inline_query(
+        self,
+        update: Update,
+        context: ContextTypes.DEFAULT_TYPE,
+    ) -> None:
+        async with telegram_span(update=update, name="on_inline_query"):
+            inline_query = update.inline_query
+            if inline_query is None:
+                raise RuntimeError("No inline query")
 
-def _not_song_link(url: str) -> bool:
-    return "song.link" not in url
+            query_text: str = inline_query.query.strip()
+            if not query_text:
+                _LOG.debug("Ignoring empty inline query")
+                await inline_query.answer(results=[])
+                return
 
+            try:
+                url = parse.urlparse(query_text)
+            except ValueError:
+                _LOG.debug("Received non-URL query")
+                await inline_query.answer(results=[])
+                return
 
-def _build_result(api: LinkApi, entity: EntityMatch) -> SongResult | None:
-    try:
-        data = api.lookup_links(entity.require_url())
-    except IoException as e:
-        _LOG.error(
-            f"Could not look up data for URL {entity.require_url()}",
-            exc_info=e,
-        )
-        return None
+            if url.scheme not in ["http", "https"]:
+                _LOG.debug("Received non-HTTP URL")
+                await inline_query.answer(results=[])
+                return
 
-    if data is None:
-        return None
+            song_result = await self._build_result(
+                EntityMatch(
+                    position=EntityPosition(offset=0, length=len(query_text)),
+                    url=query_text,
+                ),
+            )
 
-    return SongResult(data, is_spoiler=entity.is_spoiler)
+            results = [song_result.to_inline_result()] if song_result else []
+            await inline_query.answer(results=results)
 
+    async def _build_result(self, entity: EntityMatch) -> SongResult | None:
+        try:
+            data = await self._link_api.lookup_links(entity.require_url())
+        except IoException as e:
+            _LOG.error(
+                f"Could not look up data for URL {entity.require_url()}",
+                exc_info=e,
+            )
+            return None
 
-def _build_message(formatted_links: Iterable[str]) -> str:
-    return "\n\n".join(formatted_links)
+        if data is None:
+            return None
+
+        return SongResult(data, is_spoiler=entity.is_spoiler)
