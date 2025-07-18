@@ -7,7 +7,7 @@ from opentelemetry.exporter.otlp.proto.grpc._log_exporter import OTLPLogExporter
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.asyncio import AsyncioInstrumentor  # pyright: ignore
 from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
-from opentelemetry.instrumentation.logging import LoggingInstrumentor # pyright: ignore
+from opentelemetry.instrumentation.logging import LoggingInstrumentor  # pyright: ignore
 from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
 from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
