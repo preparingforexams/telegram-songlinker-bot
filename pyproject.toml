@@ -47,8 +47,8 @@ bs-config = { index = "internal" }
 bs-nats-updater = { index = "internal" }
 
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["uv_build==0.8.*"]
+build-backend = "uv_build"
 
 [tool.pytest.ini_options]
 markers = [
