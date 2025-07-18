@@ -34,7 +34,7 @@ from telegram.ext import (
 
 from songlinker.config import Config
 from songlinker.link_api import IoException, LinkApi, Platform, SongData
-from songlinker.tracing import InstrumentedHttpxRequest
+from songlinker.telemetry import InstrumentedHttpxRequest
 
 _LOG = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)

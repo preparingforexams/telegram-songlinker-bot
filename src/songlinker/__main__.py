@@ -8,9 +8,9 @@ from bs_config import Env
 
 from songlinker.bot import Bot
 from songlinker.config import Config
-from songlinker.tracing import setup_tracing
+from songlinker.telemetry import setup_telemetry
 
-_LOG = logging.getLogger("songlinker")
+_LOG = logging.getLogger(__package__)
 
 
 def _setup_logging() -> None:
@@ -39,7 +39,7 @@ def app(ctx: click.Context) -> None:
     config = Config.from_env(env)
     _setup_logging()
     _setup_sentry(config)
-    setup_tracing(config)
+    setup_telemetry(config)
 
     ctx.obj = config
 
