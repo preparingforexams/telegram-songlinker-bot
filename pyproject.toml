@@ -30,7 +30,7 @@ dependencies = [
 dev = [
     "pyright ==1.1.405",
     "pytest >=8.0.0, <9.0.0",
-    "pytest-asyncio==1.1.1",
+    "pytest-asyncio==1.2.0",
     "pytest-mock >=3.11.1, <4.0.0",
     "pytest-recording >=0.13.0, <0.14.0",
     "ruff ==0.13.0",
