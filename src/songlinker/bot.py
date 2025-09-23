@@ -135,7 +135,7 @@ class SongResult:
                 parse_mode="HTML",
                 link_preview_options=link_preview_options,
             ),
-            **thumbnail_data,  # pyright: ignore
+            **thumbnail_data,  # type: ignore
         )
 
 
@@ -243,7 +243,7 @@ class Bot:
 
         app = (
             Application.builder()
-            .post_shutdown(self._close)  # pyright: ignore[reportUnknownMemberType]
+            .post_shutdown(self._close)
             .updater(create_updater(bot, config.nats))
             .build()
         )
