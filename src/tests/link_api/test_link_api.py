@@ -1,4 +1,5 @@
 import os
+from collections.abc import AsyncIterator
 
 import httpx
 import pytest
@@ -7,27 +8,27 @@ import pytest_asyncio
 from songlinker.link_api import IoException, LinkApi, Platform
 
 
-@pytest.fixture()
+@pytest.fixture
 def api_token(require_integration) -> str:
     result = os.getenv("SONGLINK_API_TOKEN")
     assert result, "SONGLINK_API_TOKEN not set"
     return result
 
 
-@pytest_asyncio.fixture()
-async def link_api(api_token) -> LinkApi:  # pyright: ignore[reportInvalidTypeForm]
+@pytest_asyncio.fixture
+async def link_api(api_token) -> AsyncIterator[LinkApi]:
     api = LinkApi(api_key=api_token)
     try:
-        yield api  # pyright: ignore[reportReturnType]
+        yield api
     finally:
         await api.close()
 
 
-@pytest_asyncio.fixture()
-async def invalid_api() -> LinkApi:  # pyright: ignore[reportInvalidTypeForm]
+@pytest_asyncio.fixture
+async def invalid_api() -> AsyncIterator[LinkApi]:
     api = LinkApi(api_key="invalid")
     try:
-        yield api  # pyright: ignore[reportReturnType]
+        yield api
     finally:
         await api.close()
 

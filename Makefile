@@ -5,7 +5,7 @@ check: lint test
 lint:
 	uv run ruff format src/
 	uv run ruff check --fix --show-fixes src/
-	uv run pyright src/
+	uv run mypy src/
 
 .PHONY: test
 test:
