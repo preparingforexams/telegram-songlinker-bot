@@ -13,7 +13,9 @@ tracer = trace.get_tracer(__name__)
 
 
 class CamelCaseModel(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel)
+    model_config = ConfigDict(
+        alias_generator=to_camel,
+    )
 
 
 UniqueEntityId = Annotated[
@@ -48,9 +50,9 @@ class PlatformMetadata(CamelCaseModel):
     artist_name: str
     api_provider: str
 
-    thumbnail_url: str | None
-    thumbnail_width: float | int | None
-    thumbnail_height: float | int | None
+    thumbnail_url: str | None = None
+    thumbnail_width: float | int | None = None
+    thumbnail_height: float | int | None = None
 
     platforms: Annotated[list[str], Field(min_length=1)]
 
