@@ -19,13 +19,13 @@ jobs:
     uses: BlindfoldedSurgery/actions-python/.github/workflows/lint.yml@v5
     with:
       build-tool: uv
-      python-version: '3.13'
+      python-version: '3.14'
 
   integration-test:
     uses: BlindfoldedSurgery/actions-python/.github/workflows/test.yml@v5
     with:
       build-tool: uv
-      python-version: '3.13'
+      python-version: '3.14'
       tests-selector: integration
     secrets:
       ENVIRONMENT_VARIABLES: |
@@ -35,7 +35,7 @@ jobs:
     uses: BlindfoldedSurgery/actions-python/.github/workflows/test.yml@v5
     with:
       build-tool: uv
-      python-version: '3.13'
+      python-version: '3.14'
       tests-selector: not integration
 
   build-container-image:
