@@ -13,7 +13,7 @@ jobs:
       contents: read
       pull-requests: write
       checks: write
-    uses: BlindfoldedSurgery/actions-meta/.github/workflows/required.yml@v1
+    uses: BlindfoldedSurgery/actions-meta/.github/workflows/required.yml@v2
 
   lint:
     uses: BlindfoldedSurgery/actions-python/.github/workflows/lint.yml@v5
