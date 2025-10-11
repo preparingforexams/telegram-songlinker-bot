@@ -43,7 +43,7 @@ jobs:
       - lint
       - unit-test
       - integration-test
-    uses: preparingforexams/actions-container/.github/workflows/build-dual-image-kaniko.yml@v7
+    uses: preparingforexams/actions-container/.github/workflows/build-dual-image-buildah.yml@v7
     permissions:
       contents: read
       packages: write
