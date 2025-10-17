@@ -1,6 +1,6 @@
 import logging
+from typing import TYPE_CHECKING
 
-import httpx
 from opentelemetry import trace
 from opentelemetry._logs import set_logger_provider
 from opentelemetry.exporter.otlp.proto.grpc._log_exporter import OTLPLogExporter
@@ -16,7 +16,10 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.sdk.trace.sampling import Decision, StaticSampler
 from telegram.request import HTTPXRequest
 
-from songlinker.config import Config
+if TYPE_CHECKING:
+    import httpx
+
+    from songlinker.config import Config
 
 
 def setup_telemetry(config: Config) -> None:
