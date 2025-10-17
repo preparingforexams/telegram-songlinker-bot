@@ -1,11 +1,14 @@
 import os
-from collections.abc import AsyncIterator
+from typing import TYPE_CHECKING
 
 import httpx
 import pytest
 import pytest_asyncio
 
 from songlinker.link_api import IoException, LinkApi, Platform
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
 
 
 @pytest.fixture

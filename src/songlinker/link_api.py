@@ -1,13 +1,15 @@
-from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import Enum
-from typing import Annotated, NamedTuple
+from typing import TYPE_CHECKING, Annotated, NamedTuple
 
 import httpx
 from opentelemetry import trace
 from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl
 from pydantic.alias_generators import to_camel
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 tracer = trace.get_tracer(__name__)
 

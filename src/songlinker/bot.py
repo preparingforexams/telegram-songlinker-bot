@@ -3,10 +3,9 @@ import logging
 import signal
 import uuid
 from collections import OrderedDict
-from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
-from typing import Any, NamedTuple, Self, cast
+from typing import TYPE_CHECKING, Any, NamedTuple, Self, cast
 from urllib import parse
 
 from bs_nats_updater import create_updater
@@ -32,9 +31,13 @@ from telegram.ext import (
     filters,
 )
 
-from songlinker.config import Config
 from songlinker.link_api import IoException, LinkApi, Platform, SongData
 from songlinker.telemetry import InstrumentedHttpxRequest
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
+
+    from songlinker.config import Config
 
 _LOG = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
