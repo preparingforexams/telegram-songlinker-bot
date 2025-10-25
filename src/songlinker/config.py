@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from bs_config import Env
 
 
-@dataclass
+@dataclass(frozen=True, kw_only=True)
 class Config:
     app_version: str
     nats: NatsConfig
