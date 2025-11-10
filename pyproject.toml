@@ -50,16 +50,14 @@ bs-nats-updater = { index = "internal" }
 requires = ["uv_build==0.9.*"]
 build-backend = "uv_build"
 
-[tool.pytest.ini_options]
-markers = [
-    "integration",
-]
+[tool.pytest]
+strict = true
 addopts = [
     "--import-mode=importlib",
 ]
-
-[tool.pyright]
-strict = [ "src/songlinker/**/*" ]
+markers = [
+    "integration",
+]
 
 [tool.ruff.lint]
 select = [
