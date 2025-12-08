@@ -34,7 +34,7 @@ dev = [
     "pytest-mock >=3.11.1, <4.0.0",
     "pytest-recording >=0.13.0, <0.14.0",
     "ruff ==0.14.8",
-    "vcrpy >=8.0.0, <8.1.0",
+    "vcrpy >=8.1.0, <8.2.0",
 ]
 
 [[tool.uv.index]]
