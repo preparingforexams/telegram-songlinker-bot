@@ -16,13 +16,13 @@ jobs:
     uses: BlindfoldedSurgery/actions-meta/.github/workflows/required.yml@v2
 
   lint:
-    uses: BlindfoldedSurgery/actions-python/.github/workflows/lint.yml@v7
+    uses: BlindfoldedSurgery/actions-python/.github/workflows/lint.yml@v8
     with:
       build-tool: uv
       python-version: '3.14'
 
   integration-test:
-    uses: BlindfoldedSurgery/actions-python/.github/workflows/test.yml@v7
+    uses: BlindfoldedSurgery/actions-python/.github/workflows/test.yml@v8
     with:
       build-tool: uv
       python-version: '3.14'
@@ -32,7 +32,7 @@ jobs:
         SONGLINK_API_TOKEN=${{ secrets.SONGLINK_API_TOKEN }}
 
   unit-test:
-    uses: BlindfoldedSurgery/actions-python/.github/workflows/test.yml@v7
+    uses: BlindfoldedSurgery/actions-python/.github/workflows/test.yml@v8
     with:
       build-tool: uv
       python-version: '3.14'
