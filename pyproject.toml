@@ -21,7 +21,7 @@ dependencies = [
     "opentelemetry-instrumentation-httpx",
     "opentelemetry-instrumentation-logging",
     "pydantic ==2.12.*",
-    "python-telegram-bot ==22.5",
+    "python-telegram-bot ==22.6",
     "sentry-sdk >=2.0.0, <3.0.0",
     "uvloop ==0.22.*",
 ]
