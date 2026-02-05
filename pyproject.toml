@@ -47,7 +47,7 @@ bs-config = { index = "internal" }
 bs-nats-updater = { index = "internal" }
 
 [build-system]
-requires = ["uv_build==0.9.*"]
+requires = ["uv_build==0.10.*"]
 build-backend = "uv_build"
 
 [tool.pytest]
